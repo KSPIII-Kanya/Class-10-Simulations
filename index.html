@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>கணித வரைபட உருவகப்படுத்துதல்</title>
+    <style>
+        /* CSS Reset and Basic Styles */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary-color: #10b981;
+            --background-light: #f5f3ff;
+            --text-dark: #1e29b;
+            --text-light: #475569;
+            --border-color: #d1d5db;
+            --white: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* App Container and Header */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background-color: var(--white);
+            padding: 1rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px var(--shadow-color);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .app-header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--primary-color);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .app-header p {
+            font-size: clamp(0.75rem, 2vw, 1rem);
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Home Screen Styles */
+        #homeScreen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            flex-grow: 1;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+            border-color: var(--primary-color);
+        }
+
+        .card h2 {
+            font-size: clamp(2.25rem, 7vw, 3.5rem);
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-light);
+        }
+        
+        .card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f9fafb;
+        }
+        
+        .card.disabled:hover {
+             transform: none;
+             box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+             border-color: transparent;
+        }
+
+        /* Simulation Screen Styles */
+        #simulationScreen {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--white);
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-btn:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+        
+        .simulation-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px var(--shadow-color);
+        }
+
+        .controls-panel h2 {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .controls-panel p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .data-table {
+            width: 100%;
+            text-align: center;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+        }
+
+        .data-table td {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .data-table th {
+            background-color: #e0e7ff;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            align-items: center;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            width: 80px;
+        }
+        #addPointBtn, #addPointBtn2 {
+            padding: 0.6rem 0.8rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+        .btn-secondary:hover {
+             background-color: #4b5563;
+        }
+
+        .btn:disabled {
+            background-color: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .formula {
+            background-color: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+
+        /* Feedback and Result Box */
+        .feedback-box, .result-box {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-weight: 500;
+            min-height: 50px;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .result-box {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background-color: #ecfdf5;
+            color: #065f46;
+        }
+        .question-box {
+             background-color: #fffbeb;
+             border: 1px solid #fde68a;
+             padding: 1rem;
+             margin-top: 1.5rem;
+             border-radius: 0.75rem;
+        }
+        .question-box p {
+             margin-bottom: 0.5rem;
+             font-weight: 600;
+        }
+
+
+        /* Slider */
+        .slider-container {
+            padding-top: 1rem;
+        }
+        .slider-container label {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            margin: 10px 0;
+            background: transparent;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px; cursor: pointer; background: #c7d2fe; border-radius: 4px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px; width: 20px; border-radius: 50%; background: var(--primary-color); cursor: pointer;
+            -webkit-appearance: none; margin-top: -6px; box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* Canvas Panel */
+        .canvas-panel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+        #graphCanvas, #graphCanvas2 {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+        }
+        
+        #graphCanvas.plotting-active, #graphCanvas2.plotting-active {
+            cursor: none;
+        }
+        
+        #plot-tool-activator, #plot-tool-activator2 {
+            text-align: center;
+            margin-top: 1rem;
+            background-color: #eef2ff;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            border: 2px dashed var(--primary-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #plot-tool-activator:hover, #plot-tool-activator2:hover {
+            background-color: #e0e7ff;
+        }
+        #activatorFinger, #activatorFinger2 {
+            font-size: 2.5rem;
+            user-select: none;
+        }
+
+        .app-footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+            font-weight: bold;
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .simulation-grid {
+                grid-template-columns: 400px 1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1 id="headerTitle">கன்ய சம்பூர்ணா திட்டம்/கன்யா பெண்கள் கல்வி திட்டம்</h1>
+            <p style="font-weight: 600; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">இத்திட்டம் TITAN மற்றும் KALIKE நிறுவனங்களின் பங்களிப்புடன் செயல்படுத்தப்படுகிறது</p>
+            <p style="font-size: clamp(1.2rem, 3.5vw, 1.75rem); font-weight: 600; margin-top: 0.5rem;">பத்தாம் வகுப்பு - கணிதம்</p>
+        </header>
+
+        <main id="mainContent">
+            <!-- Home Screen -->
+            <div id="homeScreen">
+                <div class="card-grid">
+                    <div id="graphButton" class="card">
+                        <h2>வரைபடங்கள்</h2>
+                    </div>
+                    <div class="card disabled">
+                        <h2>வடிவியல்</h2>
+                        <p>(விரைவில் வருகிறது)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Screen -->
+            <div id="simulationScreen" class="hidden">
+                 <div class="tab-container">
+                    <button class="tab-btn active" data-tab="model1">மாதிரி 1</button>
+                    <button class="tab-btn" data-tab="model2">மாதிரி 2</button>
+                </div>
+                <!-- Model 1 Content -->
+                <div id="model1" class="tab-content active">
+                    <div class="simulation-grid">
+                        <div class="controls-panel panel">
+                            <h2>கணக்கு</h2>
+                            <p>
+                                <b>வர்ஷிகா வெவ்வேறு அளவுகளில் 6 வட்டங்களை வரைந்தாள். அட்டவணையில் உள்ளவாறு, ஒவ்வொரு வட்டத்தின் விட்டத்திற்கும் அதன் சுற்றளவிற்கும் உள்ள தோராயத் தொடர்புக்கு ஒரு வரைபடம் வரையவும். அதனைப் பயன்படுத்தி, விட்டமானது 6 செ.மீ ஆக இருக்கும்போது வட்டத்தின் சுற்றளவைக் காண்க.</b>
+                            </p>
+                            
+                            <p class="formula"><b>சூத்திரம்: சுற்றளவு ≈ π × விட்டம்</b></p>
+
+                             <div class="input-group">
+                                <input type="number" id="xInput" placeholder="விட்டம் (x)">
+                                <button id="addPointBtn" class="btn btn-secondary">சேர்க்க</button>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>விட்டம் (x)</th><th>சுற்றளவு (y)</th></tr>
+                                </thead>
+                                <tbody id="dataTableBody">
+                                    <!-- Data points will be populated by script -->
+                                </tbody>
+                            </table>
+                            
+                            <div id="plot-tool-activator" class="hidden">
+                                <div id="activatorFinger">👆</div>
+                                <span>புள்ளியைக் குறிக்க இதை அழுத்தவும்</span>
+                            </div>
+
+                            <div class="btn-group">
+                                <button id="plotBtn" class="btn btn-primary" disabled>1. புள்ளிகளைக் குறிக்கவும்</button>
+                                <button id="lineBtn" class="btn btn-primary" disabled>2. நேர்க்கோடு வரையவும்</button>
+                                
+                                <div id="sliderSection" class="slider-container hidden">
+                                    <label for="diameterSlider">3. விட்டத்தை தேர்வு செய்யவும்: <span id="sliderValue" style="font-size: 1.25rem; font-weight: bold;">6</span> செ.மீ</label>
+                                    <input type="range" id="diameterSlider" min="1" max="10" value="6" step="0.5">
+                                </div>
+                                 <div id="resultBox" class="result-box hidden"></div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button id="resetBtn" class="btn btn-secondary" style="flex: 1;">மீட்டமை</button>
+                                <button id="backBtn" class="btn btn-secondary" style="flex: 1; background-color: #ef4444;">பின் செல்</button>
+                            </div>
+                            <div class="feedback-box" id="feedbackBox">
+                                வழிமுறைகளுக்கு இங்கே பார்க்கவும்.
+                            </div>
+                        </div>
+
+                        <div class="canvas-panel panel">
+                            <canvas id="graphCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                 <!-- Model 2 Content -->
+                <div id="model2" class="tab-content">
+                    <div class="simulation-grid">
+                         <div class="controls-panel panel">
+                            <h2>கணக்கு</h2>
+                            <p>
+                                <b>ஒரு பேருந்து 50 கி.மீ/மணி என்ற சீரான வேகத்தில் பயணிக்கிறது. இத்தொடர்புக்கான தூரம் – நேரம் வரைபடம் வரைந்து, பின்வருவனவற்றைக் காண்க.</b>
+                            </p>
+                             <ul style="padding-left: 20px; margin-bottom: 1rem;">
+                                 <li><b>(i) விகிதசம மாறிலியைக் காண்க</b></li>
+                                 <li><b>(ii) 90 நிமிடங்களில் பயணிக்கும் தூரம் எவ்வளவு?</b></li>
+                                 <li><b>(iii) 300 கி.மீ. தூரத்தை பயணிக்க எவ்வளவு நேரம் ஆகும்?</b></li>
+                             </ul>
+                            
+                            <p class="formula"><b>சூத்திரம்: y = kx</b></p>
+
+                             <div class="input-group">
+                                <input type="number" id="xInput2" placeholder="நேரம் (நிமிடங்களில்)">
+                                <button id="addPointBtn2" class="btn btn-secondary">சேர்க்க</button>
+                            </div>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>பயண நேரம் (x) நிமிடங்கள்</th><th>பயண தூரம் (y) கி.மீ-ல்</th></tr>
+                                </thead>
+                                <tbody id="dataTableBody2"></tbody>
+                            </table>
+                            
+                            <div id="plot-tool-activator2" class="hidden">
+                                <div id="activatorFinger2">👆</div>
+                                <span>புள்ளியைக் குறிக்க இதை அழுத்தவும்</span>
+                            </div>
+
+                            <div class="btn-group">
+                                <button id="plotBtn2" class="btn btn-primary" disabled>1. புள்ளிகளைக் குறிக்கவும்</button>
+                                <button id="lineBtn2" class="btn btn-primary" disabled>2. நேர்க்கோடு வரையவும்</button>
+                            </div>
+                            
+                             <div id="questionsSection2" class="hidden">
+                                 <div class="question-box">
+                                     <p>(i) விகிதசம மாறிலி (k):</p>
+                                     <div id="resultBox2_k" class="result-box" style="margin-top: 0;"></div>
+                                 </div>
+                                <div class="question-box">
+                                     <p>(ii) 90 நிமிடங்களில் பயணிக்கும் தூரம்:</p>
+                                     <div id="sliderSection2_dist" class="slider-container">
+                                        <label for="timeSlider">நேரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_time">90</span> நிமிடங்கள்</label>
+                                        <input type="range" id="timeSlider" min="0" max="360" value="90" step="10">
+                                    </div>
+                                    <div id="resultBox2_dist" class="result-box"></div>
+                                </div>
+                                 <div class="question-box">
+                                     <p>(iii) 300 கி.மீ. பயணிக்க ஆகும் நேரம்:</p>
+                                     <div id="sliderSection2_time" class="slider-container">
+                                        <label for="distSlider">தூரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_dist">300</span> கி.மீ</label>
+                                        <input type="range" id="distSlider" min="0" max="350" value="300" step="10">
+                                    </div>
+                                     <div id="resultBox2_time" class="result-box"></div>
+                                 </div>
+                             </div>
+
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button id="resetBtn2" class="btn btn-secondary" style="flex: 1;">மீட்டமை</button>
+                                <button id="backBtn2" class="btn btn-secondary" style="flex: 1; background-color: #ef4444;">பின் செல்</button>
+                            </div>
+                            <div class="feedback-box" id="feedbackBox2">
+                                வழிமுறைகளுக்கு இங்கே பார்க்கவும்.
+                            </div>
+                        </div>
+                        <div class="canvas-panel panel">
+                            <canvas id="graphCanvas2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="app-footer">
+            <p>Powered by Artificial Intelligence, this simulation has been created by Kalike, an associate organization of Tata Trusts.</p>
+        </footer>
+    </div>
+
+<script>
+    // --- COMMON ---
+    const homeScreen = document.getElementById('homeScreen');
+    const simulationScreen = document.getElementById('simulationScreen');
+    const graphButton = document.getElementById('graphButton');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const headerTitle = document.getElementById('headerTitle');
+
+    // --- MODEL 1 ELEMENTS ---
+    const backBtn = document.getElementById('backBtn');
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const plotBtn = document.getElementById('plotBtn');
+    const lineBtn = document.getElementById('lineBtn');
+    const sliderSection = document.getElementById('sliderSection');
+    const diameterSlider = document.getElementById('diameterSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const resultBox = document.getElementById('resultBox');
+    const resetBtn = document.getElementById('resetBtn');
+    const feedbackBox = document.getElementById('feedbackBox');
+    const xInput = document.getElementById('xInput');
+    const addPointBtn = document.getElementById('addPointBtn');
+    const dataTableBody = document.getElementById('dataTableBody');
+    const plotToolActivator = document.getElementById('plot-tool-activator');
+    let activatorFinger = document.getElementById('activatorFinger');
+
+    // --- MODEL 2 ELEMENTS ---
+    const backBtn2 = document.getElementById('backBtn2');
+    const canvas2 = document.getElementById('graphCanvas2');
+    const ctx2 = canvas2.getContext('2d');
+    const plotBtn2 = document.getElementById('plotBtn2');
+    const lineBtn2 = document.getElementById('lineBtn2');
+    const questionsSection2 = document.getElementById('questionsSection2');
+    const timeSlider = document.getElementById('timeSlider');
+    const sliderValue2_time = document.getElementById('sliderValue2_time');
+    const resultBox2_dist = document.getElementById('resultBox2_dist');
+    const distSlider = document.getElementById('distSlider');
+    const sliderValue2_dist = document.getElementById('sliderValue2_dist');
+    const resultBox2_time = document.getElementById('resultBox2_time');
+    const resultBox2_k = document.getElementById('resultBox2_k');
+    const resetBtn2 = document.getElementById('resetBtn2');
+    const feedbackBox2 = document.getElementById('feedbackBox2');
+    const xInput2 = document.getElementById('xInput2');
+    const addPointBtn2 = document.getElementById('addPointBtn2');
+    const dataTableBody2 = document.getElementById('dataTableBody2');
+    const plotToolActivator2 = document.getElementById('plot-tool-activator2');
+    let activatorFinger2 = document.getElementById('activatorFinger2');
+
+    // --- MODEL 1 STATE ---
+    let data = [];
+    let pointsPlotted = false;
+    let lineDrawn = false;
+    let graphDrawn = false;
+    let plottingMode = false;
+    let currentPointIndex = 0;
+    let userPlottedPoints = [];
+    let mouseCanvasPos = { x: -1, y: -1 };
+    let snappedGraphPos = { x: -1, y: -1 };
+    let isNearTarget = false;
+    let isToolActive = false;
+    let padding = 60;
+    let maxX = 10, maxY = 31;
+    let xScale, yScale;
+    
+    // --- MODEL 2 STATE ---
+    let data2 = [];
+    let pointsPlotted2 = false;
+    let lineDrawn2 = false;
+    let graphDrawn2 = false;
+    let plottingMode2 = false;
+    let currentPointIndex2 = 0;
+    let userPlottedPoints2 = [];
+    let mouseCanvasPos2 = { x: -1, y: -1 };
+    let snappedGraphPos2 = { x: -1, y: -1 };
+    let isNearTarget2 = false;
+    let isToolActive2 = false;
+    let padding2 = 60;
+    let maxX2 = 360, maxY2 = 350;
+    let xScale2, yScale2;
+    const proportionalityConstant = 5 / 6; // 50km per 60 mins
+
+    // --- EVENT HANDLER REFERENCES ---
+    let plotMoveHandler1, touchMoveHandler1, plotClickHandler1;
+    let plotMoveHandler2, touchMoveHandler2, plotClickHandler2;
+
+    // --- GENERAL FUNCTIONS ---
+
+    function switchTab(targetTabId) {
+        tabContents.forEach(content => content.classList.remove('active'));
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+
+        document.getElementById(targetTabId).classList.add('active');
+        document.querySelector(`.tab-btn[data-tab="${targetTabId}"]`).classList.add('active');
+
+        if (targetTabId === 'model1') {
+            resizeCanvas();
+        } else if (targetTabId === 'model2') {
+            if (data2.length === 0 && !plottingMode2) { // Prevents re-init during plotting
+                initModel2();
+            }
+            resizeCanvas2();
+        }
+    }
+    
+    window.addEventListener('resize', () => {
+        const activeTab = document.querySelector('.tab-content.active').id;
+        if (activeTab === 'model1') resizeCanvas();
+        else if (activeTab === 'model2') resizeCanvas2();
+    });
+
+    // --- MODEL 1: CIRCLE SIMULATION ---
+
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        const size = Math.min(container.clientWidth - 30, container.clientHeight - 30, 800);
+        canvas.width = size;
+        canvas.height = size;
+        if (graphDrawn) {
+            updateGraphBounds();
+            drawGraph();
+        } else {
+             clearCanvas();
+        }
+    }
+    
+    function clearCanvas(){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#6b7280';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('முதலில் விட்டத்தின் மதிப்புகளை உள்ளிடவும்', canvas.width / 2, canvas.height / 2);
+    }
+    
+    function updateGraphBounds() {
+        if (data.length === 0) return;
+        const maxD = data.reduce((max, p) => Math.max(max, p.d), 0);
+        const maxC = data.reduce((max, p) => Math.max(max, p.c), 0);
+        maxX = Math.max(10, Math.ceil((maxD + 2)));
+        maxY = Math.max(20, Math.ceil((maxC + 5)));
+        xScale = (canvas.width - 2 * padding) / maxX;
+        yScale = (canvas.height - 2 * padding) / maxY;
+        diameterSlider.max = maxX;
+    }
+
+    function drawGraph() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (!graphDrawn) {
+            clearCanvas();
+            return;
+        }
+        
+        // Draw Axes
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, canvas.height - padding);
+        ctx.lineTo(canvas.width - padding, canvas.height - padding);
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        drawArrow(ctx, canvas.width - padding, canvas.height - padding, true);
+        drawArrow(ctx, padding, padding, false);
+
+        // Labels
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('விட்டம் (x) (செ.மீ)', canvas.width / 2, canvas.height - 15);
+        ctx.save();
+        ctx.translate(20, canvas.height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('சுற்றளவு (y) (செ.மீ)', 0, 0);
+        ctx.restore();
+
+        // Ticks, Gridlines, and Labels
+        ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        for (let i = 0; i <= maxX; i += 1) {
+            const x = padding + i * xScale;
+            ctx.fillStyle = '#1e293b';
+            ctx.fillText(i, x, canvas.height - padding + 10);
+            if (i > 0) {
+                ctx.beginPath();
+                ctx.moveTo(x, canvas.height - padding);
+                ctx.lineTo(x, padding);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#a1a1aa';
+                ctx.stroke();
+            }
+        }
+        
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= maxY; i += 1) {
+             const y = canvas.height - padding - i * yScale;
+             if (i > 0) {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillText(i, padding - 10, y);
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#a1a1aa';
+                ctx.stroke();
+             }
+        }
+        
+        userPlottedPoints.forEach(p => drawPoint(p.d, p.c, '#4f46e5', 8));
+        
+        // Draw permanent coordinate labels for correctly plotted points in Model 1
+        ctx.font = 'bold 14px sans-serif';
+        ctx.fillStyle = '#1e293b';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        userPlottedPoints.forEach(p => {
+            const xPos = padding + p.d * xScale;
+            const yPos = canvas.height - padding - p.c * yScale;
+            const coordText = `(${p.d}, ${p.c})`;
+            ctx.fillText(coordText, xPos + 10, yPos - 10);
+        });
+
+        if (isToolActive && mouseCanvasPos.x > 0 && mouseCanvasPos.y > 0) {
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            
+            ctx.font = '32px sans-serif';
+            ctx.fillStyle = isNearTarget ? '#10b981' : '#ef4444';
+            ctx.fillText('👆', mouseCanvasPos.x, mouseCanvasPos.y);
+
+            const coordText = `(${snappedGraphPos.x.toFixed(1)}, ${snappedGraphPos.y.toFixed(1)})`;
+            
+            ctx.font = 'bold 20px monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            const textMetrics = ctx.measureText(coordText);
+            
+            const tailX = mouseCanvasPos.x + 15;
+            const tailY = mouseCanvasPos.y + 15;
+            
+            ctx.fillStyle = isNearTarget ? 'rgba(16, 185, 129, 0.9)' : 'rgba(30, 41, 59, 0.8)';
+            ctx.beginPath();
+            ctx.roundRect(tailX - 5, tailY - 14, textMetrics.width + 10, 28, 7);
+            ctx.fill();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(coordText, tailX, tailY);
+            
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillStyle = '#1e293b';
+        }
+
+        if (lineDrawn) {
+            drawLine();
+            diameterSlider.dispatchEvent(new Event('input'));
+        }
+    }
+    
+    function drawArrow(ctx, x, y, isHorizontal) {
+        ctx.beginPath();
+        if (isHorizontal) {
+            ctx.moveTo(x, y); ctx.lineTo(x - 10, y - 5); ctx.lineTo(x - 10, y + 5);
+        } else {
+            ctx.moveTo(x, y); ctx.lineTo(x - 5, y + 10); ctx.lineTo(x + 5, y + 10);
+        }
+        ctx.closePath(); ctx.fillStyle = '#333'; ctx.fill();
+    }
+
+    function drawPoint(d, c, color = '#4f46e5', radius = 6) {
+        if (d > maxX || c > maxY) return;
+        const x = padding + d * xScale;
+        const y = canvas.height - padding - c * yScale;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+    }
+    
+    function startManualPlotting() {
+        if (data.length < 5) {
+            feedbackBox.textContent = 'தொடங்குவதற்கு முன் 5 புள்ளிகளைச் சேர்க்கவும்.';
+            return;
+        }
+
+        graphDrawn = true;
+        plottingMode = true;
+        currentPointIndex = 0;
+        userPlottedPoints = [];
+        plotBtn.disabled = true;
+        updateGraphBounds();
+        drawGraph();
+        
+        plotToolActivator.classList.remove('hidden');
+        activatorFinger.addEventListener('click', activatePlottingTool, { once: true });
+        updateFeedbackForPlotting();
+    }
+    
+    function activatePlottingTool() {
+        isToolActive = true;
+        canvas.classList.add('plotting-active');
+        plotToolActivator.classList.add('hidden');
+        feedbackBox.innerHTML = `வரைபடத்தில் தொட்டு <b>(${data[currentPointIndex].d}, ${data[currentPointIndex].c})</b> என்ற புள்ளியைக் கண்டறியவும்.`;
+        
+        plotMoveHandler1 = (e) => plotMove(e, 1);
+        touchMoveHandler1 = (e) => plotMove(e, 1);
+        plotClickHandler1 = (e) => handlePlotClick(e, 1);
+
+        document.addEventListener('mousemove', plotMoveHandler1);
+        document.addEventListener('touchmove', touchMoveHandler1, { passive: false });
+        document.addEventListener('click', plotClickHandler1);
+    }
+
+    function plotMove(e, model) {
+        let currentCanvas, currentPadding, currentXScale, currentYScale, currentMaxX, currentMaxY;
+        let currentSnappedPos, currentMousePos, currentTarget;
+
+        if (model === 1) {
+            if (!isToolActive) return;
+            currentCanvas = canvas;
+            currentPadding = padding;
+            currentXScale = xScale; currentYScale = yScale;
+            currentMaxX = maxX; currentMaxY = maxY;
+            currentSnappedPos = snappedGraphPos;
+            currentMousePos = mouseCanvasPos;
+            currentTarget = data[currentPointIndex];
+        } else { // model 2
+            if (!isToolActive2) return;
+            currentCanvas = canvas2;
+            currentPadding = padding2;
+            currentXScale = xScale2; currentYScale = yScale2;
+            currentMaxX = maxX2; currentMaxY = maxY2;
+            currentSnappedPos = snappedGraphPos2;
+            currentMousePos = mouseCanvasPos2;
+            currentTarget = data2[currentPointIndex2];
+        }
+
+        e.preventDefault();
+        const rect = currentCanvas.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX; clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX; clientY = e.clientY;
+        }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - currentPadding) / currentXScale;
+        let graphY = (currentCanvas.height - currentPadding - rawMouseY) / currentYScale;
+
+        graphX = Math.max(0, Math.min(currentMaxX, graphX));
+        graphY = Math.max(0, Math.min(currentMaxY, graphY));
+
+        const snapX = (model === 1) ? 10 : 1;
+        const snapY = (model === 1) ? 10 : 1;
+        currentSnappedPos.x = parseFloat((Math.round(graphX * snapX) / snapX).toFixed(1));
+        currentSnappedPos.y = parseFloat((Math.round(graphY * snapY) / snapY).toFixed(1));
+
+        currentMousePos.x = currentPadding + currentSnappedPos.x * currentXScale;
+        currentMousePos.y = currentCanvas.height - currentPadding - currentSnappedPos.y * currentYScale;
+        
+        const targetX = (model === 1) ? currentTarget.d : currentTarget.t;
+        const targetY = (model === 1) ? currentTarget.c : currentTarget.d;
+        
+        if (model === 1) {
+            isNearTarget = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
+            drawGraph();
+        } else {
+            isNearTarget2 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
+            drawGraph2();
+        }
+    }
+    
+    function handlePlotClick(e, model) {
+        let currentIsNearTarget;
+        
+        if (model === 1) {
+            if (!isToolActive) return;
+            currentIsNearTarget = isNearTarget;
+        } else {
+            if (!isToolActive2) return;
+            currentIsNearTarget = isNearTarget2;
+        }
+
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+        
+        if (currentIsNearTarget) {
+            if (model === 1) {
+                userPlottedPoints.push(data[currentPointIndex]);
+                currentPointIndex++;
+
+                if (currentPointIndex === 5 && data.length === 5) {
+                    data.push({ d: 6, c: 18.6 });
+                    updateTable(); 
+                    updateGraphBounds();
+                    updateFeedbackForPlotting();
+                } else if (currentPointIndex >= data.length) {
+                    plottingMode = false;
+                    pointsPlotted = true;
+                    lineBtn.disabled = false;
+                    updateTable(); 
+                    feedbackBox.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது நேர்க்கோடு வரையவும்.';
+                } else {
+                    updateFeedbackForPlotting();
+                }
+            } else { // Model 2
+                userPlottedPoints2.push(data2[currentPointIndex2]);
+                currentPointIndex2++;
+                if (currentPointIndex2 >= data2.length) {
+                    plottingMode2 = false;
+                    pointsPlotted2 = true;
+                    lineBtn2.disabled = false;
+                    feedbackBox2.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது நேர்க்கோடு வரையவும்.';
+                } else {
+                    updateFeedbackForPlotting2();
+                }
+            }
+        } else {
+            const fb = (model === 1) ? feedbackBox : feedbackBox2;
+            fb.style.backgroundColor = '#fee2e2';
+            fb.style.color = '#b91c1c';
+            fb.textContent = 'தவறான இடம்! சரியான புள்ளியைக் கண்டறியவும்.';
+            
+            setTimeout(() => {
+                fb.style.backgroundColor = '#eef2ff';
+                fb.style.color = 'var(--primary-dark)';
+                if (model === 1) updateFeedbackForPlotting();
+                else updateFeedbackForPlotting2();
+            }, 2000);
+        }
+
+        if (model === 1) {
+            isToolActive = false;
+            document.removeEventListener('mousemove', plotMoveHandler1);
+            document.removeEventListener('touchmove', touchMoveHandler1);
+            document.removeEventListener('click', plotClickHandler1);
+
+            canvas.classList.remove('plotting-active');
+            mouseCanvasPos = { x: -1, y: -1 };
+            if (plottingMode && currentPointIndex < data.length) {
+                plotToolActivator.classList.remove('hidden');
+                activatorFinger.addEventListener('click', activatePlottingTool, { once: true });
+            }
+            drawGraph();
+        } else { // Model 2
+            isToolActive2 = false;
+            document.removeEventListener('mousemove', plotMoveHandler2);
+            document.removeEventListener('touchmove', touchMoveHandler2);
+            document.removeEventListener('click', plotClickHandler2);
+
+            canvas2.classList.remove('plotting-active');
+            mouseCanvasPos2 = { x: -1, y: -1 };
+            if (plottingMode2 && currentPointIndex2 < data2.length) {
+                plotToolActivator2.classList.remove('hidden');
+                activatorFinger2.addEventListener('click', activatePlottingTool2, { once: true });
+            }
+            drawGraph2();
+        }
+    }
+    
+    function updateFeedbackForPlotting() {
+        if (currentPointIndex < data.length) {
+            const target = data[currentPointIndex];
+            feedbackBox.innerHTML = `புள்ளி குறிக்கும் கருவியை அழுத்தி, வரைபடத்தில் <b>(${target.d}, ${target.c})</b> என்ற புள்ளியைக் கண்டறியவும்.`;
+        }
+    }
+    
+    function drawLine() {
+        if (!pointsPlotted) return;
+        
+        const slope = 3.1;
+        const startX = padding;
+        const startY = canvas.height - padding;
+        const endX = padding + maxX * xScale;
+        const endY = canvas.height - padding - (maxX * slope) * yScale;
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
+    function handleSliderInput() {
+        if (!lineDrawn) return;
+
+        const slope = 3.1;
+        const diameter = parseFloat(diameterSlider.value);
+        sliderValue.textContent = diameter;
+        const circumference = diameter * slope;
+        
+        drawGraph(); 
+
+        const x = padding + diameter * xScale;
+        const y = canvas.height - padding - circumference * yScale;
+        
+        ctx.beginPath();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2;
+        ctx.moveTo(x, canvas.height - padding);
+        ctx.lineTo(x, y);
+        ctx.lineTo(padding, y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        drawPoint(diameter, circumference, '#10b981', 8);
+
+        resultBox.textContent = `விட்டம் ${diameter} செ.மீ எனில், சுற்றளவு ≈ ${circumference.toFixed(1)} செ.மீ`;
+    }
+
+    function updateTable() {
+        dataTableBody.innerHTML = '';
+        data.forEach((point, index) => {
+            const row = document.createElement('tr');
+            const isFinalUnplottedPoint = (index === 5 && currentPointIndex < 6);
+            const yValue = isFinalUnplottedPoint ? '?' : point.c;
+            row.innerHTML = `<td>${point.d}</td><td>${yValue}</td>`;
+            dataTableBody.appendChild(row);
+        });
+    }
+
+    function resetSimulation() {
+        data = [];
+        pointsPlotted = lineDrawn = graphDrawn = plottingMode = isToolActive = isNearTarget = false;
+        plotBtn.disabled = lineBtn.disabled = true;
+        xInput.disabled = addPointBtn.disabled = false;
+        xInput.value = '';
+        sliderSection.classList.add('hidden');
+        resultBox.classList.add('hidden');
+        diameterSlider.value = 6;
+        sliderValue.textContent = '6';
+        updateTable();
+        canvas.classList.remove('plotting-active');
+        currentPointIndex = 0;
+        userPlottedPoints = [];
+        snappedGraphPos = { x: -1, y: -1 };
+        plotToolActivator.classList.add('hidden');
+        const newActivator = activatorFinger.cloneNode(true);
+        activatorFinger.parentNode.replaceChild(newActivator, activatorFinger);
+        activatorFinger = newActivator;
+        feedbackBox.innerHTML = '<b>முதலில், 1 முதல் 5 வரை விட்டத்தின் மதிப்புகளை உள்ளிடவும்.</b>';
+        resizeCanvas();
+    }
+
+    // --- MODEL 2: BUS SIMULATION ---
+
+    function initModel2() {
+        data2 = []; // Start with an empty array
+        feedbackBox2.innerHTML = '<b>அட்டவணையை முடிக்க 4 நேர மதிப்புகளை (நிமிடங்களில்) உள்ளிடவும்.</b>';
+        plotBtn2.disabled = true; // Disable plot button initially
+        xInput2.disabled = false; // Enable input
+        addPointBtn2.disabled = false; // Enable add button
+        xInput2.value = '';
+        updateTable2();
+        resizeCanvas2();
+    }
+
+    function resizeCanvas2() {
+        const container = canvas2.parentElement;
+        const size = Math.min(container.clientWidth - 30, container.clientHeight - 30, 800);
+        canvas2.width = size;
+        canvas2.height = size;
+        if (graphDrawn2) {
+            updateGraphBounds2();
+            drawGraph2();
+        } else {
+             clearCanvas2();
+        }
+    }
+
+    function clearCanvas2() {
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+        ctx2.fillStyle = '#6b7280';
+        ctx2.font = 'bold 16px sans-serif';
+        ctx2.textAlign = 'center';
+        ctx2.fillText('நேர மதிப்புகளை உள்ளிடவும்', canvas2.width / 2, canvas2.height / 2);
+    }
+
+    function updateGraphBounds2() {
+        maxX2 = 360; // max time in minutes
+        maxY2 = 350; // max distance in km
+        xScale2 = (canvas2.width - 2 * padding2) / maxX2;
+        yScale2 = (canvas2.height - 2 * padding2) / maxY2;
+        timeSlider.max = maxX2;
+        distSlider.max = maxY2;
+    }
+
+    function drawGraph2() {
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+
+        if (!graphDrawn2) {
+            clearCanvas2();
+            return;
+        }
+
+        // Draw Axes
+        ctx2.beginPath();
+        ctx2.moveTo(padding2, padding2);
+        ctx2.lineTo(padding2, canvas2.height - padding2);
+        ctx2.lineTo(canvas2.width - padding2, canvas2.height - padding2);
+        ctx2.strokeStyle = '#333';
+        ctx2.lineWidth = 2;
+        ctx2.stroke();
+        drawArrow(ctx2, canvas2.width - padding2, canvas2.height - padding2, true);
+        drawArrow(ctx2, padding2, padding2, false);
+
+        // Labels
+        ctx2.fillStyle = '#1e293b';
+        ctx2.font = 'bold 16px sans-serif';
+        ctx2.textAlign = 'center';
+        ctx2.fillText('நேரம் (x) (நிமிடங்கள்)', canvas2.width / 2, canvas2.height - 15);
+        ctx2.save();
+        ctx2.translate(20, canvas2.height / 2);
+        ctx2.rotate(-Math.PI / 2);
+        ctx2.fillText('தூரம் (y) (கி.மீ)', 0, 0);
+        ctx2.restore();
+
+        // Ticks and Gridlines
+        ctx2.font = 'bold 12px sans-serif';
+        ctx2.textAlign = 'center';
+        ctx2.textBaseline = 'top';
+
+        // X-Axis
+        for (let i = 0; i <= maxX2; i += 30) {
+            const x = padding2 + i * xScale2;
+            ctx2.fillStyle = '#1e293b';
+            ctx2.fillText(i, x, canvas2.height - padding2 + 10);
+            if (i > 0) {
+                ctx2.beginPath();
+                ctx2.moveTo(x, canvas2.height - padding2);
+                ctx2.lineTo(x, padding2);
+                ctx2.lineWidth = 1; ctx2.strokeStyle = '#d1d5db'; ctx2.stroke();
+            }
+        }
+
+        // Y-Axis
+        ctx2.textAlign = 'right';
+        ctx2.textBaseline = 'middle';
+        for (let i = 0; i <= maxY2; i += 50) {
+            const y = canvas2.height - padding2 - i * yScale2;
+            if (i >= 0) {
+                ctx2.fillStyle = '#1e293b';
+                ctx2.fillText(i, padding2 - 10, y);
+                if (i > 0) {
+                   ctx2.beginPath();
+                   ctx2.moveTo(padding2, y);
+                   ctx2.lineTo(canvas2.width - padding2, y);
+                   ctx2.lineWidth = 1; ctx2.strokeStyle = '#d1d5db'; ctx2.stroke();
+                }
+            }
+        }
+
+        userPlottedPoints2.forEach(p => {
+            drawPoint2(p.t, p.d, '#4f46e5', 8);
+        });
+        
+        // Draw permanent coordinate labels for correctly plotted points
+        ctx2.font = 'bold 14px sans-serif';
+        ctx2.fillStyle = '#1e293b';
+        ctx2.textAlign = 'left';
+        ctx2.textBaseline = 'bottom';
+        userPlottedPoints2.forEach(p => {
+            const xPos = padding2 + p.t * xScale2;
+            const yPos = canvas2.height - padding2 - p.d * yScale2;
+            const coordText = `(${p.t}, ${p.d})`;
+            ctx2.fillText(coordText, xPos + 10, yPos - 10);
+        });
+
+
+        if (isToolActive2 && mouseCanvasPos2.x > 0) {
+             ctx2.textAlign = 'center'; 
+             ctx2.textBaseline = 'top';
+             ctx2.font = '32px sans-serif';
+             ctx2.fillStyle = isNearTarget2 ? '#10b981' : '#ef4444';
+             ctx2.fillText('👆', mouseCanvasPos2.x, mouseCanvasPos2.y);
+             
+             const coordText = `(${snappedGraphPos2.x.toFixed(0)}, ${snappedGraphPos2.y.toFixed(0)})`;
+            
+             ctx2.font = 'bold 20px monospace';
+             ctx2.textAlign = 'left';
+             ctx2.textBaseline = 'middle';
+             const textMetrics = ctx2.measureText(coordText);
+            
+             const tailX = mouseCanvasPos2.x + 15;
+             const tailY = mouseCanvasPos2.y + 15;
+            
+             ctx2.fillStyle = isNearTarget2 ? 'rgba(16, 185, 129, 0.9)' : 'rgba(30, 41, 59, 0.8)';
+             ctx2.beginPath();
+             const rectX = tailX + textMetrics.width + 10 > canvas2.width ? canvas2.width - textMetrics.width - 25 : tailX - 5;
+             ctx2.roundRect(rectX, tailY - 14, textMetrics.width + 10, 28, 7);
+             ctx2.fill();
+            
+             ctx2.fillStyle = '#ffffff';
+             ctx2.fillText(coordText, rectX + 5, tailY);
+
+             ctx2.textAlign = 'center';
+             ctx2.textBaseline = 'alphabetic';
+             ctx2.fillStyle = '#1e293b';
+        }
+
+        if (lineDrawn2) {
+            drawLine2();
+            drawTimeSliderVisuals();
+            drawDistSliderVisuals();
+        }
+    }
+    
+    function drawPoint2(t, d, color = '#4f46e5', radius = 6) {
+        if (t > maxX2 || d > maxY2) return;
+        const x = padding2 + t * xScale2;
+        const y = canvas2.height - padding2 - d * yScale2;
+        ctx2.beginPath();
+        ctx2.arc(x, y, radius, 0, Math.PI * 2);
+        ctx2.fillStyle = color;
+        ctx2.fill();
+        ctx2.strokeStyle = 'white'; ctx2.lineWidth = 2; ctx2.stroke();
+    }
+    
+    function startManualPlotting2() {
+        graphDrawn2 = true;
+        plottingMode2 = true;
+        currentPointIndex2 = 0;
+        // Keep userPlottedPoints2 as is, don't reset
+        plotBtn2.disabled = true;
+        updateGraphBounds2();
+        drawGraph2();
+        plotToolActivator2.classList.remove('hidden');
+        activatorFinger2.addEventListener('click', activatePlottingTool2, { once: true });
+        updateFeedbackForPlotting2();
+    }
+    
+    function activatePlottingTool2() {
+        isToolActive2 = true;
+        canvas2.classList.add('plotting-active');
+        plotToolActivator2.classList.add('hidden');
+        updateFeedbackForPlotting2();
+
+        plotMoveHandler2 = (e) => plotMove(e, 2);
+        touchMoveHandler2 = (e) => plotMove(e, 2);
+        plotClickHandler2 = (e) => handlePlotClick(e, 2);
+
+        document.addEventListener('mousemove', plotMoveHandler2);
+        document.addEventListener('touchmove', touchMoveHandler2, { passive: false });
+        document.addEventListener('click', plotClickHandler2);
+    }
+    
+    function updateFeedbackForPlotting2() {
+        if (currentPointIndex2 < data2.length) {
+            const target = data2[currentPointIndex2];
+            feedbackBox2.innerHTML = `புள்ளி குறிக்கும் கருவியை அழுத்தி, வரைபடத்தில் <b>(${target.t}, ${target.d})</b> என்ற புள்ளியைக் கண்டறியவும்.`;
+        }
+    }
+
+    function drawLine2() {
+        if (!pointsPlotted2) return;
+        const startX = padding2;
+        const startY = canvas2.height - padding2;
+        const endX = padding2 + maxX2 * xScale2;
+        const endY = canvas2.height - padding2 - (maxX2 * proportionalityConstant) * yScale2;
+        ctx2.beginPath();
+        ctx2.moveTo(startX, startY);
+        ctx2.lineTo(endX, endY);
+        ctx2.strokeStyle = '#ef4444'; ctx2.lineWidth = 3; ctx2.stroke();
+    }
+    
+    function drawTimeSliderVisuals() {
+        if (!lineDrawn2) return;
+        const time = parseFloat(timeSlider.value);
+        const distance = time * proportionalityConstant;
+        const x = padding2 + time * xScale2;
+        const y = canvas2.height - padding2 - distance * yScale2;
+        
+        ctx2.beginPath(); ctx2.setLineDash([5, 5]); ctx2.strokeStyle = '#10b981'; ctx2.lineWidth = 2;
+        ctx2.moveTo(x, canvas2.height - padding2); ctx2.lineTo(x, y); ctx2.lineTo(padding2, y);
+        ctx2.stroke(); ctx2.setLineDash([]);
+        
+        drawPoint2(time, distance, '#10b981', 8);
+    }
+
+    function drawDistSliderVisuals() {
+        if (!lineDrawn2) return;
+        const distance = parseFloat(distSlider.value);
+        const time = distance / proportionalityConstant;
+        const x = padding2 + time * xScale2;
+        const y = canvas2.height - padding2 - distance * yScale2;
+
+        ctx2.beginPath(); ctx2.setLineDash([5, 5]); ctx2.strokeStyle = '#0ea5e9'; ctx2.lineWidth = 2;
+        ctx2.moveTo(padding2, y); ctx2.lineTo(x, y); ctx2.lineTo(x, canvas2.height - padding2);
+        ctx2.stroke(); ctx2.setLineDash([]);
+        
+        drawPoint2(time, distance, '#0ea5e9', 8);
+    }
+    
+    function handleTimeSlider() {
+        if (!lineDrawn2) return;
+        const time = parseFloat(timeSlider.value);
+        sliderValue2_time.textContent = time;
+        const distance = time * proportionalityConstant;
+        resultBox2_dist.innerHTML = `y = kx <br> y = (5/6) * ${time} = ${distance.toFixed(1)} கி.மீ`;
+        drawGraph2();
+    }
+
+    function handleDistSlider() {
+        if (!lineDrawn2) return;
+        const distance = parseFloat(distSlider.value);
+        sliderValue2_dist.textContent = distance;
+        const time = distance / proportionalityConstant;
+        resultBox2_time.innerHTML = `x = y/k <br> x = ${distance} / (5/6) = ${time.toFixed(1)} நிமிடங்கள்`;
+        drawGraph2();
+    }
+
+    function updateTable2() {
+        dataTableBody2.innerHTML = '';
+        data2.forEach(point => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${point.t}</td><td>${point.d}</td>`;
+            dataTableBody2.appendChild(row);
+        });
+    }
+
+    function resetSimulation2() {
+        // Clear all state variables for model 2
+        pointsPlotted2 = false;
+        lineDrawn2 = false;
+        graphDrawn2 = false;
+        plottingMode2 = false;
+        isToolActive2 = false;
+        isNearTarget2 = false;
+        currentPointIndex2 = 0;
+        userPlottedPoints2 = [];
+        snappedGraphPos2 = { x: -1, y: -1 };
+
+        // Reset UI elements that are not handled by initModel2
+        lineBtn2.disabled = true;
+        questionsSection2.classList.add('hidden');
+        timeSlider.value = 90;
+        distSlider.value = 300;
+        canvas2.classList.remove('plotting-active');
+        plotToolActivator2.classList.add('hidden');
+        
+        // Clean up event listeners for the activator finger
+        const newActivator = activatorFinger2.cloneNode(true);
+        activatorFinger2.parentNode.replaceChild(newActivator, activatorFinger2);
+        activatorFinger2 = newActivator;
+
+        // Re-initialize the simulation to its starting state (which now handles the input fields and data array)
+        initModel2();
+    }
+    
+    // --- EVENT LISTENERS ---
+
+    // General
+    headerTitle.addEventListener('click', () => {
+        homeScreen.classList.remove('hidden');
+        simulationScreen.classList.add('hidden');
+        resetSimulation();
+        resetSimulation2();
+    });
+
+    graphButton.addEventListener('click', () => {
+        homeScreen.classList.add('hidden');
+        simulationScreen.classList.remove('hidden');
+        switchTab('model1');
+    });
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // Model 1
+    backBtn.addEventListener('click', () => {
+        homeScreen.classList.remove('hidden');
+        simulationScreen.classList.add('hidden');
+        resetSimulation();
+        resetSimulation2();
+    });
+
+    addPointBtn.addEventListener('click', () => {
+        if (data.length >= 5) {
+            feedbackBox.textContent = '5 மதிப்புகள் சேர்க்கப்பட்டன.'; return;
+        }
+        const x = parseFloat(xInput.value);
+        if (!isNaN(x) && x > 0) {
+            const y = parseFloat((x * 3.1).toFixed(1));
+            data.push({ d: x, c: y });
+            updateTable();
+            xInput.value = ''; xInput.focus();
+            if (data.length >= 5) {
+                plotBtn.disabled = false;
+                xInput.disabled = true; addPointBtn.disabled = true;
+                feedbackBox.innerHTML = '<b>5 மதிப்புகள் சேர்க்கப்பட்டன. இப்போது "புள்ளிகளைக் குறிக்கவும்" பொத்தானை அழுத்தவும்.</b>';
+            } else {
+                 feedbackBox.textContent = `(${x}, ${y}) புள்ளி சேர்க்கப்பட்டது.`;
+            }
+        } else {
+            feedbackBox.textContent = 'விட்டத்திற்கு சரியான நேர்மறை எண்ணை உள்ளிடவும்.';
+        }
+    });
+
+    plotBtn.addEventListener('click', startManualPlotting);
+    
+    lineBtn.addEventListener('click', () => {
+        if (!pointsPlotted) return;
+        lineDrawn = true;
+        lineBtn.disabled = true;
+        sliderSection.classList.remove('hidden');
+        resultBox.classList.remove('hidden');
+        feedbackBox.textContent = 'சிறப்பு! இப்போது ஸ்லைடரைப் பயன்படுத்தி வெவ்வேறு விட்டத்திற்கான சுற்றளவைக் கண்டறியவும்.';
+        drawGraph();
+    });
+
+    diameterSlider.addEventListener('input', handleSliderInput);
+    resetBtn.addEventListener('click', resetSimulation);
+    
+    // Model 2
+    backBtn2.addEventListener('click', () => {
+        homeScreen.classList.remove('hidden');
+        simulationScreen.classList.add('hidden');
+        resetSimulation();
+        resetSimulation2();
+    });
+
+    addPointBtn2.addEventListener('click', () => {
+        if (data2.length >= 4) {
+            feedbackBox2.textContent = '4 மதிப்புகள் ஏற்கனவே சேர்க்கப்பட்டுள்ளன.';
+            return;
+        }
+
+        const t = parseFloat(xInput2.value);
+        if (!isNaN(t) && t > 0) {
+            const d = parseFloat((t * proportionalityConstant).toFixed(1));
+            data2.push({ t, d });
+            updateTable2();
+            xInput2.value = '';
+            xInput2.focus();
+
+            if (data2.length === 4) {
+                feedbackBox2.innerHTML = '<b>அருமை! இப்போது வரைபடத்தில் "புள்ளிகளைக் குறிக்கவும்".</b>';
+                plotBtn2.disabled = false;
+                xInput2.disabled = true;
+                addPointBtn2.disabled = true;
+            } else {
+                feedbackBox2.textContent = `(${t}, ${d}) புள்ளி சேர்க்கப்பட்டது. மீதமுள்ள ${4 - data2.length} மதிப்புகளை உள்ளிடவும்.`;
+            }
+        } else {
+            feedbackBox2.textContent = 'நேரத்திற்கு சரியான நேர்மறை எண்ணை உள்ளிடவும்.';
+        }
+    });
+
+    plotBtn2.addEventListener('click', startManualPlotting2);
+    
+    lineBtn2.addEventListener('click', () => {
+        if (!pointsPlotted2) return;
+        lineDrawn2 = true;
+        lineBtn2.disabled = true;
+        questionsSection2.classList.remove('hidden');
+        
+        resultBox2_k.textContent = 'k = y/x = 50 கி.மீ / 60 நிமிடங்கள் = 5/6';
+        
+        const initialTime = parseFloat(timeSlider.value);
+        const initialDistance = initialTime * proportionalityConstant;
+        resultBox2_dist.innerHTML = `y = kx <br> y = (5/6) * ${initialTime} = ${initialDistance.toFixed(1)} கி.மீ`;
+        
+        const initialDist = parseFloat(distSlider.value);
+        const initialTimeForDist = initialDist / proportionalityConstant;
+        resultBox2_time.innerHTML = `x = y/k <br> x = ${initialDist} / (5/6) = ${initialTimeForDist.toFixed(1)} நிமிடங்கள்`;
+
+        feedbackBox2.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
+        drawGraph2();
+    });
+    
+    timeSlider.addEventListener('input', handleTimeSlider);
+    distSlider.addEventListener('input', handleDistSlider);
+    resetBtn2.addEventListener('click', resetSimulation2);
+
+    // Initial setup
+    clearCanvas();
+    clearCanvas2();
+
+</script>
+
+</body>
+</html>
+
