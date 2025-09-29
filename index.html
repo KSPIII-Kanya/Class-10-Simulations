@@ -11,7 +11,7 @@
             --primary-dark: #4338ca;
             --secondary-color: #10b981;
             --background-light: #f5f3ff;
-            --text-dark: #1e29b;
+            --text-dark: #1e293b;
             --text-light: #475569;
             --border-color: #d1d5db;
             --white: #ffffff;
@@ -35,6 +35,12 @@
             color: var(--text-dark);
             display: flex;
             flex-direction: column;
+        }
+        
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
         }
 
         /* App Container and Header */
@@ -99,6 +105,7 @@
             cursor: pointer;
             border: 2px solid transparent;
             text-align: center;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
         }
 
         .card:hover {
@@ -154,6 +161,7 @@
             color: var(--text-light);
             border-bottom: 3px solid transparent;
             transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
         }
         
         .tab-btn:hover {
@@ -184,6 +192,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.5rem;
+            height: 100%;
         }
 
         .panel {
@@ -232,13 +241,13 @@
             gap: 0.5rem;
             margin: 1rem 0;
             align-items: center;
+            flex-wrap: wrap; /* Allows wrapping on small screens */
         }
         .input-group input {
-            flex: 1;
+            flex: 1 1 120px; /* Allow input to grow/shrink with a base size */
             padding: 0.6rem;
             border: 1px solid var(--border-color);
             border-radius: 0.5rem;
-            width: 80px;
         }
         #addPointBtn, #addPointBtn2 {
             padding: 0.6rem 0.8rem;
@@ -259,6 +268,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 2px 4px var(--shadow-color);
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary {
@@ -345,8 +355,8 @@
             width: 100%; height: 8px; cursor: pointer; background: #c7d2fe; border-radius: 4px;
         }
         input[type=range]::-webkit-slider-thumb {
-            height: 20px; width: 20px; border-radius: 50%; background: var(--primary-color); cursor: pointer;
-            -webkit-appearance: none; margin-top: -6px; box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            height: 24px; width: 24px; border-radius: 50%; background: var(--primary-color); cursor: pointer;
+            -webkit-appearance: none; margin-top: -8px; box-shadow: 0 0 5px rgba(0,0,0,0.3);
         }
 
         /* Canvas Panel */
@@ -356,10 +366,13 @@
             align-items: center;
             justify-content: center;
             min-height: 400px;
+            height: 100%;
         }
         #graphCanvas, #graphCanvas2 {
             background-color: var(--white);
             border-radius: 0.75rem;
+            max-width: 100%;
+            max-height: 100%;
         }
         
         #graphCanvas.plotting-active, #graphCanvas2.plotting-active {
@@ -375,6 +388,7 @@
             border: 2px dashed var(--primary-color);
             cursor: pointer;
             transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         #plot-tool-activator:hover, #plot-tool-activator2:hover {
             background-color: #e0e7ff;
@@ -540,17 +554,17 @@
                                 <div class="question-box">
                                      <p>(ii) 90 நிமிடங்களில் பயணிக்கும் தூரம்:</p>
                                      <div id="sliderSection2_dist" class="slider-container">
-                                        <label for="timeSlider">நேரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_time">90</span> நிமிடங்கள்</label>
-                                        <input type="range" id="timeSlider" min="0" max="360" value="90" step="10">
-                                    </div>
+                                         <label for="timeSlider">நேரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_time">90</span> நிமிடங்கள்</label>
+                                         <input type="range" id="timeSlider" min="0" max="360" value="90" step="10">
+                                     </div>
                                     <div id="resultBox2_dist" class="result-box"></div>
                                 </div>
                                  <div class="question-box">
                                      <p>(iii) 300 கி.மீ. பயணிக்க ஆகும் நேரம்:</p>
                                      <div id="sliderSection2_time" class="slider-container">
-                                        <label for="distSlider">தூரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_dist">300</span> கி.மீ</label>
-                                        <input type="range" id="distSlider" min="0" max="350" value="300" step="10">
-                                    </div>
+                                         <label for="distSlider">தூரத்தை தேர்வு செய்யவும்: <span id="sliderValue2_dist">300</span> கி.மீ</label>
+                                         <input type="range" id="distSlider" min="0" max="350" value="300" step="10">
+                                     </div>
                                      <div id="resultBox2_time" class="result-box"></div>
                                  </div>
                              </div>
@@ -691,7 +705,7 @@
 
     function resizeCanvas() {
         const container = canvas.parentElement;
-        const size = Math.min(container.clientWidth - 30, container.clientHeight - 30, 800);
+        const size = Math.min(container.clientWidth - 20, container.clientHeight - 20, 800);
         canvas.width = size;
         canvas.height = size;
         if (graphDrawn) {
@@ -766,7 +780,7 @@
                 ctx.moveTo(x, canvas.height - padding);
                 ctx.lineTo(x, padding);
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = '#a1a1aa';
+                ctx.strokeStyle = '#e2e8f0';
                 ctx.stroke();
             }
         }
@@ -775,15 +789,17 @@
         ctx.textBaseline = 'middle';
         for (let i = 0; i <= maxY; i += 1) {
              const y = canvas.height - padding - i * yScale;
+             if (i > 0 && i % 2 === 0) { // Label every 2 units for clarity
+                 ctx.fillStyle = '#1e293b';
+                 ctx.fillText(i, padding - 10, y);
+             }
              if (i > 0) {
-                ctx.fillStyle = '#1e293b';
-                ctx.fillText(i, padding - 10, y);
-                ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(canvas.width - padding, y);
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#a1a1aa';
-                ctx.stroke();
+                 ctx.beginPath();
+                 ctx.moveTo(padding, y);
+                 ctx.lineTo(canvas.width - padding, y);
+                 ctx.lineWidth = 1;
+                 ctx.strokeStyle = '#e2e8f0';
+                 ctx.stroke();
              }
         }
         
@@ -816,16 +832,27 @@
             ctx.textBaseline = 'middle';
             const textMetrics = ctx.measureText(coordText);
             
-            const tailX = mouseCanvasPos.x + 15;
+            const tailXBase = mouseCanvasPos.x;
             const tailY = mouseCanvasPos.y + 15;
-            
+            let rectX, textX;
+
+            // Position tooltip to the right by default
+            rectX = tailXBase + 20;
+            textX = rectX + 5;
+
+            // If it overflows right, position to the left
+            if (rectX + textMetrics.width + 10 > canvas.width) {
+                rectX = tailXBase - 20 - textMetrics.width - 10;
+                textX = rectX + 5;
+            }
+
             ctx.fillStyle = isNearTarget ? 'rgba(16, 185, 129, 0.9)' : 'rgba(30, 41, 59, 0.8)';
             ctx.beginPath();
-            ctx.roundRect(tailX - 5, tailY - 14, textMetrics.width + 10, 28, 7);
+            ctx.roundRect(rectX, tailY - 14, textMetrics.width + 10, 28, 7);
             ctx.fill();
             
             ctx.fillStyle = '#ffffff';
-            ctx.fillText(coordText, tailX, tailY);
+            ctx.fillText(coordText, textX, tailY);
             
             ctx.textAlign = 'center';
             ctx.textBaseline = 'alphabetic';
@@ -880,6 +907,7 @@
     
     function activatePlottingTool() {
         isToolActive = true;
+        document.body.classList.add('no-select');
         canvas.classList.add('plotting-active');
         plotToolActivator.classList.add('hidden');
         feedbackBox.innerHTML = `வரைபடத்தில் தொட்டு <b>(${data[currentPointIndex].d}, ${data[currentPointIndex].c})</b> என்ற புள்ளியைக் கண்டறியவும்.`;
@@ -934,10 +962,15 @@
         graphX = Math.max(0, Math.min(currentMaxX, graphX));
         graphY = Math.max(0, Math.min(currentMaxY, graphY));
 
-        const snapX = (model === 1) ? 10 : 1;
-        const snapY = (model === 1) ? 10 : 1;
-        currentSnappedPos.x = parseFloat((Math.round(graphX * snapX) / snapX).toFixed(1));
-        currentSnappedPos.y = parseFloat((Math.round(graphY * snapY) / snapY).toFixed(1));
+        if (model === 1) {
+            const snapValue = 10;
+            currentSnappedPos.x = parseFloat((Math.round(graphX * snapValue) / snapValue).toFixed(1));
+            currentSnappedPos.y = parseFloat((Math.round(graphY * snapValue) / snapValue).toFixed(1));
+        } else {
+             // For model 2, snap to nearest whole number for better usability
+            currentSnappedPos.x = Math.round(graphX);
+            currentSnappedPos.y = Math.round(graphY);
+        }
 
         currentMousePos.x = currentPadding + currentSnappedPos.x * currentXScale;
         currentMousePos.y = currentCanvas.height - currentPadding - currentSnappedPos.y * currentYScale;
@@ -1015,6 +1048,7 @@
 
         if (model === 1) {
             isToolActive = false;
+            document.body.classList.remove('no-select');
             document.removeEventListener('mousemove', plotMoveHandler1);
             document.removeEventListener('touchmove', touchMoveHandler1);
             document.removeEventListener('click', plotClickHandler1);
@@ -1028,6 +1062,7 @@
             drawGraph();
         } else { // Model 2
             isToolActive2 = false;
+            document.body.classList.remove('no-select');
             document.removeEventListener('mousemove', plotMoveHandler2);
             document.removeEventListener('touchmove', touchMoveHandler2);
             document.removeEventListener('click', plotClickHandler2);
@@ -1143,7 +1178,7 @@
 
     function resizeCanvas2() {
         const container = canvas2.parentElement;
-        const size = Math.min(container.clientWidth - 30, container.clientHeight - 30, 800);
+        const size = Math.min(container.clientWidth - 20, container.clientHeight - 20, 800);
         canvas2.width = size;
         canvas2.height = size;
         if (graphDrawn2) {
@@ -1215,7 +1250,7 @@
                 ctx2.beginPath();
                 ctx2.moveTo(x, canvas2.height - padding2);
                 ctx2.lineTo(x, padding2);
-                ctx2.lineWidth = 1; ctx2.strokeStyle = '#d1d5db'; ctx2.stroke();
+                ctx2.lineWidth = 1; ctx2.strokeStyle = '#e2e8f0'; ctx2.stroke();
             }
         }
 
@@ -1228,10 +1263,10 @@
                 ctx2.fillStyle = '#1e293b';
                 ctx2.fillText(i, padding2 - 10, y);
                 if (i > 0) {
-                   ctx2.beginPath();
-                   ctx2.moveTo(padding2, y);
-                   ctx2.lineTo(canvas2.width - padding2, y);
-                   ctx2.lineWidth = 1; ctx2.strokeStyle = '#d1d5db'; ctx2.stroke();
+                  ctx2.beginPath();
+                  ctx2.moveTo(padding2, y);
+                  ctx2.lineTo(canvas2.width - padding2, y);
+                  ctx2.lineWidth = 1; ctx2.strokeStyle = '#e2e8f0'; ctx2.stroke();
                 }
             }
         }
@@ -1267,17 +1302,25 @@
              ctx2.textBaseline = 'middle';
              const textMetrics = ctx2.measureText(coordText);
             
-             const tailX = mouseCanvasPos2.x + 15;
+             const tailXBase = mouseCanvasPos2.x;
              const tailY = mouseCanvasPos2.y + 15;
-            
+             let rectX, textX;
+
+             rectX = tailXBase + 20;
+             textX = rectX + 5;
+
+             if (rectX + textMetrics.width + 10 > canvas2.width) {
+                 rectX = tailXBase - 20 - textMetrics.width - 10;
+                 textX = rectX + 5;
+             }
+             
              ctx2.fillStyle = isNearTarget2 ? 'rgba(16, 185, 129, 0.9)' : 'rgba(30, 41, 59, 0.8)';
              ctx2.beginPath();
-             const rectX = tailX + textMetrics.width + 10 > canvas2.width ? canvas2.width - textMetrics.width - 25 : tailX - 5;
              ctx2.roundRect(rectX, tailY - 14, textMetrics.width + 10, 28, 7);
              ctx2.fill();
             
              ctx2.fillStyle = '#ffffff';
-             ctx2.fillText(coordText, rectX + 5, tailY);
+             ctx2.fillText(coordText, textX, tailY);
 
              ctx2.textAlign = 'center';
              ctx2.textBaseline = 'alphabetic';
@@ -1306,7 +1349,6 @@
         graphDrawn2 = true;
         plottingMode2 = true;
         currentPointIndex2 = 0;
-        // Keep userPlottedPoints2 as is, don't reset
         plotBtn2.disabled = true;
         updateGraphBounds2();
         drawGraph2();
@@ -1317,6 +1359,7 @@
     
     function activatePlottingTool2() {
         isToolActive2 = true;
+        document.body.classList.add('no-select');
         canvas2.classList.add('plotting-active');
         plotToolActivator2.classList.add('hidden');
         updateFeedbackForPlotting2();
@@ -1429,7 +1472,7 @@
         activatorFinger2.parentNode.replaceChild(newActivator, activatorFinger2);
         activatorFinger2 = newActivator;
 
-        // Re-initialize the simulation to its starting state (which now handles the input fields and data array)
+        // Re-initialize the simulation to its starting state
         initModel2();
     }
     
@@ -1567,4 +1610,3 @@
 
 </body>
 </html>
-
