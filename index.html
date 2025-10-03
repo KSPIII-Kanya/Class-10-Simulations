@@ -703,7 +703,7 @@
                             </div>
                             
                              <div id="questionsSection4" class="hidden">
-                                <div class="question-box">
+                                 <div class="question-box">
                                      <p>(i) x = 3 எனில், y-ன் மதிப்பு:</p>
                                      <div class="slider-container">
                                          <label for="xSlider4">x-ஐ தேர்வு செய்யவும்: <span id="sliderValue4_x">3</span></label>
@@ -768,7 +768,7 @@
     const dataTableBody = document.getElementById('dataTableBody');
     const plotToolActivator = document.getElementById('plot-tool-activator');
     let activatorFinger = document.getElementById('activatorFinger');
-
+    
     // --- MODEL 2 ELEMENTS ---
     const backBtn2 = document.getElementById('backBtn2');
     const canvas2 = document.getElementById('graphCanvas2');
@@ -840,9 +840,11 @@
     // --- MODEL 1 STATE ---
     let data = [];
     let pointsPlotted = false;
-    let lineDrawn = false;
+    let mainLineDrawn = false;
+    let solutionLinesDrawn = false;
     let graphDrawn = false;
     let plottingMode = false;
+    let waitForX6Click = false;
     let currentPointIndex = 0;
     let userPlottedPoints = [];
     let mouseCanvasPos = { x: -1, y: -1 };
@@ -957,6 +959,10 @@
         if (graphDrawn) {
             updateGraphBounds();
             drawGraph();
+            // If the solution phase is active, redraw the helper lines at the current slider position
+            if (solutionLinesDrawn) {
+                diameterSlider.dispatchEvent(new Event('input'));
+            }
         } else {
              clearCanvas();
         }
@@ -973,7 +979,7 @@
     function updateGraphBounds() {
         if (data.length === 0) return;
         const maxD = data.reduce((max, p) => Math.max(max, p.d), 0);
-        const maxC = data.reduce((max, p) => Math.max(max, p.c), 0);
+        const maxC = data.reduce((max, p) => Math.max(max, p.c === '?' ? 0 : p.c), 0);
         maxX = Math.max(10, Math.ceil((maxD + 2)));
         maxY = Math.max(20, Math.ceil((maxC + 5)));
         xScale = (canvas.width - 2 * padding) / maxX;
@@ -1114,8 +1120,11 @@
             ctx.fillStyle = '#1e293b';
         }
 
-        if (lineDrawn) {
+
+        if (mainLineDrawn) {
             drawLine();
+        }
+        if(solutionLinesDrawn) {
             diameterSlider.dispatchEvent(new Event('input'));
         }
     }
@@ -1173,7 +1182,7 @@
 
         document.addEventListener('mousemove', plotMoveHandler1);
         document.addEventListener('touchmove', touchMoveHandler1, { passive: false });
-        document.addEventListener('click', plotClickHandler1);
+        canvas.addEventListener('click', plotClickHandler1);
     }
 
     function plotMove(e, model) {
@@ -1287,17 +1296,18 @@
                 userPlottedPoints.push(data[currentPointIndex]);
                 currentPointIndex++;
 
-                if (currentPointIndex === 5 && data.length === 5) {
-                    data.push({ d: 6, c: 18.6 });
-                    updateTable(); 
-                    updateGraphBounds();
-                    updateFeedbackForPlotting();
-                } else if (currentPointIndex >= data.length) {
+                if (currentPointIndex >= data.length) {
                     plottingMode = false;
                     pointsPlotted = true;
+                    feedbackBox.innerHTML = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. <b>இப்போது "நேர்க்கோடு வரையவும்" பொத்தானை அழுத்தவும்.</b>';
                     lineBtn.disabled = false;
-                    updateTable(); 
-                    feedbackBox.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது நேர்க்கோடு வரையவும்.';
+                    
+                    if (!data.some(p => p.d === 6)) {
+                        // Add the point for the table but don't show the 'c' value yet
+                        data.push({ d: 6, c: '?' });
+                        updateTable();
+                        updateGraphBounds();
+                    }
                 } else {
                     updateFeedbackForPlotting();
                 }
@@ -1355,7 +1365,7 @@
             isToolActive = false;
             document.removeEventListener('mousemove', plotMoveHandler1);
             document.removeEventListener('touchmove', touchMoveHandler1);
-            document.removeEventListener('click', plotClickHandler1);
+            canvas.removeEventListener('click', plotClickHandler1);
             canvas.classList.remove('plotting-active');
             mouseCanvasPos = { x: -1, y: -1 };
             if (plottingMode && currentPointIndex < data.length) {
@@ -1367,7 +1377,7 @@
             isToolActive2 = false;
             document.removeEventListener('mousemove', plotMoveHandler2);
             document.removeEventListener('touchmove', touchMoveHandler2);
-            document.removeEventListener('click', plotClickHandler2);
+            canvas2.removeEventListener('click', plotClickHandler2);
             canvas2.classList.remove('plotting-active');
             mouseCanvasPos2 = { x: -1, y: -1 };
             if (plottingMode2 && currentPointIndex2 < data2.length) {
@@ -1379,7 +1389,7 @@
              isToolActive3 = false;
             document.removeEventListener('mousemove', plotMoveHandler3);
             document.removeEventListener('touchmove', touchMoveHandler3);
-            document.removeEventListener('click', plotClickHandler3);
+            canvas3.removeEventListener('click', plotClickHandler3);
             canvas3.classList.remove('plotting-active');
             mouseCanvasPos3 = { x: -1, y: -1 };
             if (plottingMode3 && currentPointIndex3 < data3.length) {
@@ -1391,7 +1401,7 @@
              isToolActive4 = false;
             document.removeEventListener('mousemove', plotMoveHandler4);
             document.removeEventListener('touchmove', touchMoveHandler4);
-            document.removeEventListener('click', plotClickHandler4);
+            canvas4.removeEventListener('click', plotClickHandler4);
             canvas4.classList.remove('plotting-active');
             mouseCanvasPos4 = { x: -1, y: -1 };
             if (plottingMode4 && currentPointIndex4 < data4.length) {
@@ -1409,9 +1419,185 @@
             feedbackBox.innerHTML = `புள்ளி குறிக்கும் கருவியை அழுத்தி, வரைபடத்தில் <b>(${target.d}, ${target.c})</b> என்ற புள்ளியைக் கண்டறியவும்.`;
         }
     }
+
+    function activateX6Finder() {
+        plotToolActivator.classList.add('hidden');
+        isToolActive = true;
+        waitForX6Click = true; // Use this flag to differentiate this mode
+        feedbackBox.innerHTML = 'அருமை! இப்போது <b>வரைபடத்தில் (6.0, 0.0) என்ற புள்ளியைக் கண்டறியவும்</b>.';
+        canvas.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler1 = (e) => plotMoveForX6(e);
+        touchMoveHandler1 = (e) => plotMoveForX6(e);
+        plotClickHandler1 = (e) => handlePlotClickForX6(e);
+
+        document.addEventListener('mousemove', plotMoveHandler1);
+        document.addEventListener('touchmove', touchMoveHandler1, { passive: false });
+        canvas.addEventListener('click', plotClickHandler1);
+    }
+
+    function plotMoveForX6(e) {
+        if (!isToolActive || !waitForX6Click) return;
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding) / xScale;
+        let graphY = (canvas.height - padding - rawMouseY) / yScale;
+
+        graphX = Math.max(0, Math.min(maxX, graphX));
+        graphY = Math.max(0, Math.min(maxY, graphY));
+
+        snappedGraphPos.x = parseFloat((Math.round(graphX * 10) / 10).toFixed(1));
+        snappedGraphPos.y = parseFloat((Math.round(graphY * 10) / 10).toFixed(1));
+
+        mouseCanvasPos.x = padding + snappedGraphPos.x * xScale;
+        mouseCanvasPos.y = canvas.height - padding - snappedGraphPos.y * yScale;
+        
+        isNearTarget = (snappedGraphPos.x === 6.0 && snappedGraphPos.y === 0.0);
+        drawGraph();
+    }
+
+    function handlePlotClickForX6(e) {
+        if (!isToolActive || !waitForX6Click) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget) {
+            // Deactivate tool
+            isToolActive = false;
+            waitForX6Click = false;
+            document.removeEventListener('mousemove', plotMoveHandler1);
+            document.removeEventListener('touchmove', touchMoveHandler1);
+            canvas.removeEventListener('click', plotClickHandler1);
+            canvas.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos = { x: -1, y: -1 };
+            drawGraph(); // Redraw without the tool
+
+            // Start animation
+            feedbackBox.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்.';
+            animateSolutionLines();
+        } else {
+            feedbackBox.style.backgroundColor = '#fee2e2';
+            feedbackBox.style.color = '#b91c1c';
+            feedbackBox.textContent = 'தவறு. வரைபடத்தில் (6.0, 0.0) புள்ளியைக் கண்டறியவும்.';
+            
+            setTimeout(() => {
+                feedbackBox.style.backgroundColor = '#eef2ff';
+                feedbackBox.style.color = 'var(--primary-dark)';
+                feedbackBox.innerHTML = 'அருமை! இப்போது <b>வரைபடத்தில் (6.0, 0.0) என்ற புள்ளியைக் கண்டறியவும்</b>.';
+            }, 2000);
+        }
+    }
+
+
+    function animateSolutionLines() {
+        const targetY = 18.6;
+        const duration = 1500; 
+        let startTime = null;
+
+        // 1. Animate Vertical Line
+        function animateVertical(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = 1 - Math.pow(1 - Math.min(progress / duration, 1), 5); // Ease-out
+            const currentY = targetY * percentage;
+
+            drawGraph(); // Redraws points and main red line
+
+            const x_canvas = padding + 6 * xScale;
+            const y_start_canvas = canvas.height - padding;
+            const y_end_canvas = canvas.height - padding - currentY * yScale;
+
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#10b981'; // Green
+            ctx.lineWidth = 2;
+            ctx.moveTo(x_canvas, y_start_canvas);
+            ctx.lineTo(x_canvas, y_end_canvas);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            if (percentage > 0.05) drawPoint(6, currentY, '#10b981', 6);
+
+            if (progress < duration) {
+                requestAnimationFrame(animateVertical);
+            } else {
+                drawPoint(6, targetY, '#10b981', 8); // Final point
+                startTime = null; // Reset for next animation
+                requestAnimationFrame(animateHorizontal); // Start horizontal animation
+            }
+        }
+
+        // 2. Animate Horizontal Line
+        function animateHorizontal(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = 1 - Math.pow(1 - Math.min(progress / duration, 1), 3); // Ease-out
+            const currentX = 6 * (1 - percentage);
+
+            drawGraph(); // Redraw everything
+
+            // Draw the completed vertical line statically
+            const x_canvas_vert = padding + 6 * xScale;
+            const y_canvas_vert_end = canvas.height - padding - targetY * yScale;
+            ctx.beginPath();
+            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+            ctx.moveTo(x_canvas_vert, canvas.height - padding);
+            ctx.lineTo(x_canvas_vert, y_canvas_vert_end);
+            ctx.stroke();
+            drawPoint(6, targetY, '#10b981', 8);
+
+            // Animate the horizontal line
+            const y_canvas_horiz = y_canvas_vert_end;
+            const x_start_horiz = x_canvas_vert;
+            const x_end_horiz = padding + currentX * xScale;
+
+            ctx.beginPath();
+            ctx.strokeStyle = '#ef4444'; // Red
+            ctx.moveTo(x_start_horiz, y_canvas_horiz);
+            ctx.lineTo(x_end_horiz, y_canvas_horiz);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+
+            if (progress < duration) {
+                requestAnimationFrame(animateHorizontal);
+            } else {
+                // Final state after both animations
+                solutionLinesDrawn = true;
+                
+                // Update data model and table
+                const pointToUpdate = data.find(p => p.d === 6);
+                if(pointToUpdate) pointToUpdate.c = 18.6;
+                updateTable();
+                
+                // Show slider and result
+                sliderSection.classList.remove('hidden');
+                resultBox.classList.remove('hidden');
+                feedbackBox.textContent = 'சிறப்பு! இப்போது ஸ்லைடரைப் பயன்படுத்தி வெவ்வேறு விட்டத்திற்கான சுற்றளவைக் கண்டறியவும்.';
+                handleSliderInput();
+            }
+        }
+
+        requestAnimationFrame(animateVertical); // Start the first animation
+    }
     
     function drawLine() {
-        if (!pointsPlotted) return;
+        if (!mainLineDrawn) return;
         
         const slope = 3.1;
         const startX = padding;
@@ -1428,7 +1614,7 @@
     }
 
     function handleSliderInput() {
-        if (!lineDrawn) return;
+        if (!solutionLinesDrawn) return;
 
         const slope = 3.1;
         const diameter = parseFloat(diameterSlider.value);
@@ -1457,18 +1643,17 @@
 
     function updateTable() {
         dataTableBody.innerHTML = '';
-        data.forEach((point, index) => {
+        data.forEach((point) => {
             const row = document.createElement('tr');
-            const isFinalUnplottedPoint = (index === 5 && currentPointIndex < 6);
-            const yValue = isFinalUnplottedPoint ? '?' : point.c;
-            row.innerHTML = `<td>${point.d}</td><td>${yValue}</td>`;
+            row.innerHTML = `<td>${point.d}</td><td>${point.c === '?' ? '?' : point.c.toFixed(1) }</td>`;
             dataTableBody.appendChild(row);
         });
     }
 
     function resetSimulation() {
         data = [];
-        pointsPlotted = lineDrawn = graphDrawn = plottingMode = isToolActive = isNearTarget = false;
+        pointsPlotted = mainLineDrawn = solutionLinesDrawn = graphDrawn = plottingMode = isToolActive = isNearTarget = false;
+        waitForX6Click = false;
         plotBtn.disabled = lineBtn.disabled = true;
         xInput.disabled = addPointBtn.disabled = false;
         xInput.value = '';
@@ -1478,10 +1663,16 @@
         sliderValue.textContent = '6';
         updateTable();
         canvas.classList.remove('plotting-active');
+
+        if (plotMoveHandler1) document.removeEventListener('mousemove', plotMoveHandler1);
+        if (touchMoveHandler1) document.removeEventListener('touchmove', touchMoveHandler1);
+        if (plotClickHandler1) canvas.removeEventListener('click', plotClickHandler1);
+        
         currentPointIndex = 0;
         userPlottedPoints = [];
         snappedGraphPos = { x: -1, y: -1 };
         plotToolActivator.classList.add('hidden');
+        plotToolActivator.querySelector('span').textContent = 'புள்ளியைக் குறிக்க இதை அழுத்தவும்';
         const newActivator = activatorFinger.cloneNode(true);
         activatorFinger.parentNode.replaceChild(newActivator, activatorFinger);
         activatorFinger = newActivator;
@@ -1705,7 +1896,7 @@
 
         document.addEventListener('mousemove', plotMoveHandler2);
         document.addEventListener('touchmove', touchMoveHandler2, { passive: false });
-        document.addEventListener('click', plotClickHandler2);
+        canvas2.addEventListener('click', plotClickHandler2);
     }
     
     function updateFeedbackForPlotting2() {
@@ -1970,7 +2161,7 @@
         plotClickHandler3 = (e) => handlePlotClick(e, 3);
         document.addEventListener('mousemove', plotMoveHandler3);
         document.addEventListener('touchmove', touchMoveHandler3, { passive: false });
-        document.addEventListener('click', plotClickHandler3);
+        canvas3.addEventListener('click', plotClickHandler3);
     }
     
     function updateFeedbackForPlotting3() {
@@ -2241,7 +2432,7 @@
         plotClickHandler4 = (e) => handlePlotClick(e, 4);
         document.addEventListener('mousemove', plotMoveHandler4);
         document.addEventListener('touchmove', touchMoveHandler4, { passive: false });
-        document.addEventListener('click', plotClickHandler4);
+        canvas4.addEventListener('click', plotClickHandler4);
     }
     
     function updateFeedbackForPlotting4() {
@@ -2402,12 +2593,21 @@
     
     lineBtn.addEventListener('click', () => {
         if (!pointsPlotted) return;
-        lineDrawn = true;
-        lineBtn.disabled = true;
-        sliderSection.classList.remove('hidden');
-        resultBox.classList.remove('hidden');
-        feedbackBox.textContent = 'சிறப்பு! இப்போது ஸ்லைடரைப் பயன்படுத்தி வெவ்வேறு விட்டத்திற்கான சுற்றளவைக் கண்டறியவும்.';
+        mainLineDrawn = true;
         drawGraph();
+        lineBtn.disabled = true;
+        
+        // Re-purpose the plot tool activator to start the "find x=6" step
+        feedbackBox.innerHTML = 'சிறப்பு! இப்போது விட்டமானது 6 செ.மீ ஆக இருக்கும்போது அதன் சுற்றளவைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+        plotToolActivator.querySelector('span').textContent = 'x = 6 இல் மதிப்பைக் கண்டறியவும்';
+        plotToolActivator.classList.remove('hidden');
+
+        // Remove old listeners and add a new one-time listener to start the find process
+        const newActivator = activatorFinger.cloneNode(true);
+        activatorFinger.parentNode.replaceChild(newActivator, activatorFinger);
+        activatorFinger = newActivator;
+        
+        activatorFinger.addEventListener('click', activateX6Finder, { once: true });
     });
 
     diameterSlider.addEventListener('input', handleSliderInput);
@@ -2636,5 +2836,4 @@
 
 </body>
 </html>
-
 
