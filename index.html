@@ -867,6 +867,9 @@
     let snappedGraphPos2 = { x: -1, y: -1 };
     let isNearTarget2 = false;
     let isToolActive2 = false;
+    let isAnimating2 = false;
+    let waitForTimeClick = false;
+    let waitForDistClick = false;
     let padding2 = 60;
     let maxX2 = 360, maxY2 = 350;
     let xScale2, yScale2;
@@ -884,6 +887,9 @@
     let snappedGraphPos3 = { x: -1, y: -1 };
     let isNearTarget3 = false;
     let isToolActive3 = false;
+    let isAnimating3 = false;
+    let waitForWorkersClick = false;
+    let waitForDaysClick = false;
     let padding3 = 60;
     let maxX3 = 200, maxY3 = 300;
     let xScale3, yScale3;
@@ -901,6 +907,9 @@
     let snappedGraphPos4 = { x: -1, y: -1 };
     let isNearTarget4 = false;
     let isToolActive4 = false;
+    let isAnimating4 = false;
+    let waitForXClick4 = false;
+    let waitForYClick4 = false;
     let padding4 = 60;
     let maxX4 = 25, maxY4 = 25;
     let xScale4, yScale4;
@@ -1357,7 +1366,7 @@
                 if (model === 1) updateFeedbackForPlotting();
                 else if (model === 2) updateFeedbackForPlotting2();
                 else if (model === 3) updateFeedbackForPlotting3();
-                else updateFeedbackForPlotting4();
+                else if (model === 4) updateFeedbackForPlotting4();
             }, 2000);
         }
 
@@ -1723,7 +1732,7 @@
         distSlider.max = maxY2;
     }
 
-    function drawGraph2() {
+    function drawGraph2(drawSliderLines = true) {
         ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
         if (!graphDrawn2) {
@@ -1855,8 +1864,10 @@
 
         if (lineDrawn2) {
             drawLine2();
-            drawTimeSliderVisuals();
-            drawDistSliderVisuals();
+            if(drawSliderLines && !isAnimating2) {
+                drawTimeSliderVisuals();
+                drawDistSliderVisuals();
+            }
         }
     }
     
@@ -1975,7 +1986,8 @@
 
     function resetSimulation2() {
         pointsPlotted2 = false; lineDrawn2 = false; graphDrawn2 = false; plottingMode2 = false;
-        isToolActive2 = false; isNearTarget2 = false; currentPointIndex2 = 0;
+        isToolActive2 = false; isNearTarget2 = false; currentPointIndex2 = 0; isAnimating2 = false;
+        waitForTimeClick = false; waitForDistClick = false;
         userPlottedPoints2 = [];
         snappedGraphPos2 = { x: -1, y: -1 };
 
@@ -2036,7 +2048,7 @@
         daysSlider3.max = maxY3;
     }
     
-    function drawGraph3() {
+    function drawGraph3(drawSliderLines = true) {
         ctx3.clearRect(0, 0, canvas3.width, canvas3.height);
 
         if (!graphDrawn3) {
@@ -2127,8 +2139,10 @@
 
         if (lineDrawn3) {
             drawLine3();
-            drawWorkersSliderVisuals();
-            drawDaysSliderVisuals();
+            if(drawSliderLines && !isAnimating3){
+                drawWorkersSliderVisuals();
+                drawDaysSliderVisuals();
+            }
         }
     }
 
@@ -2245,7 +2259,8 @@
 
     function resetSimulation3() {
         pointsPlotted3 = false; lineDrawn3 = false; graphDrawn3 = false; plottingMode3 = false;
-        isToolActive3 = false; isNearTarget3 = false; currentPointIndex3 = 0;
+        isToolActive3 = false; isNearTarget3 = false; currentPointIndex3 = 0; isAnimating3 = false;
+        waitForWorkersClick = false; waitForDaysClick = false;
         userPlottedPoints3 = [];
         snappedGraphPos3 = { x: -1, y: -1 };
         lineBtn3.disabled = true;
@@ -2306,7 +2321,7 @@
         ySlider4.max = maxY4;
     }
     
-    function drawGraph4() {
+    function drawGraph4(drawSliderLines = true) {
         ctx4.clearRect(0, 0, canvas4.width, canvas4.height);
 
         if (!graphDrawn4) {
@@ -2395,8 +2410,10 @@
 
         if (lineDrawn4) {
             drawLine4();
-            drawXSliderVisuals4();
-            drawYSliderVisuals4();
+            if(drawSliderLines && !isAnimating4){
+                drawXSliderVisuals4();
+                drawYSliderVisuals4();
+            }
         }
     }
 
@@ -2516,7 +2533,8 @@
 
     function resetSimulation4() {
         pointsPlotted4 = false; lineDrawn4 = false; graphDrawn4 = false; plottingMode4 = false;
-        isToolActive4 = false; isNearTarget4 = false; currentPointIndex4 = 0;
+        isToolActive4 = false; isNearTarget4 = false; currentPointIndex4 = 0; isAnimating4 = false;
+        waitForXClick4 = false; waitForYClick4 = false;
         userPlottedPoints4 = [];
         snappedGraphPos4 = { x: -1, y: -1 };
         lineBtn4.disabled = true;
@@ -2656,21 +2674,330 @@
         if (!pointsPlotted2) return;
         lineDrawn2 = true;
         lineBtn2.disabled = true;
-        questionsSection2.classList.remove('hidden');
         
-        resultBox2_k.textContent = 'k = y/x = 50 கி.மீ / 60 நிமிடங்கள் = 5/6';
-        
-        const initialTime = parseFloat(timeSlider.value);
-        const initialDistance = initialTime * proportionalityConstant;
-        resultBox2_dist.innerHTML = `y = kx <br> y = (5/6) * ${initialTime} = ${initialDistance.toFixed(1)} கி.மீ`;
-        
-        const initialDist = parseFloat(distSlider.value);
-        const initialTimeForDist = initialDist / proportionalityConstant;
-        resultBox2_time.innerHTML = `x = y/k <br> x = ${initialDist} / (5/6) = ${initialTimeForDist.toFixed(1)} நிமிடங்கள்`;
+        // Setup for question (ii)
+        feedbackBox2.innerHTML = '<b>கேள்வி (ii)</b>: 90 நிமிடங்களில் பயணிக்கும் தூரத்தைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+        plotToolActivator2.querySelector('span').textContent = 'x = 90 இல் மதிப்பைக் கண்டறியவும்';
+        plotToolActivator2.classList.remove('hidden');
 
-        feedbackBox2.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
-        drawGraph2();
+        const newActivator = activatorFinger2.cloneNode(true);
+        activatorFinger2.parentNode.replaceChild(newActivator, activatorFinger2);
+        activatorFinger2 = newActivator;
+
+        activatorFinger2.addEventListener('click', activateTimeFinder, { once: true });
     });
+
+    function activateTimeFinder() {
+        plotToolActivator2.classList.add('hidden');
+        isToolActive2 = true;
+        waitForTimeClick = true;
+        feedbackBox2.innerHTML = 'வரைபடத்தில் <b>(90, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas2.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler2 = (e) => plotMoveForTime(e);
+        touchMoveHandler2 = (e) => plotMoveForTime(e);
+        plotClickHandler2 = (e) => handlePlotClickForTime(e);
+
+        document.addEventListener('mousemove', plotMoveHandler2);
+        document.addEventListener('touchmove', touchMoveHandler2, { passive: false });
+        canvas2.addEventListener('click', plotClickHandler2);
+    }
+
+    function plotMoveForTime(e) {
+        if (!isToolActive2 || !waitForTimeClick) return;
+        e.preventDefault();
+        const rect = canvas2.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding2) / xScale2;
+        let graphY = (canvas2.height - padding2 - rawMouseY) / yScale2;
+
+        graphX = Math.max(0, Math.min(maxX2, graphX));
+        graphY = Math.max(0, Math.min(maxY2, graphY));
+
+        snappedGraphPos2.x = Math.round(graphX);
+        snappedGraphPos2.y = Math.round(graphY);
+
+        mouseCanvasPos2.x = padding2 + snappedGraphPos2.x * xScale2;
+        mouseCanvasPos2.y = canvas2.height - padding2 - snappedGraphPos2.y * yScale2;
+        
+        isNearTarget2 = (snappedGraphPos2.x === 90 && snappedGraphPos2.y === 0);
+        drawGraph2(false);
+    }
+
+    function handlePlotClickForTime(e) {
+        if (!isToolActive2 || !waitForTimeClick) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget2) {
+            isToolActive2 = false;
+            waitForTimeClick = false;
+            document.removeEventListener('mousemove', plotMoveHandler2);
+            document.removeEventListener('touchmove', touchMoveHandler2);
+            canvas2.removeEventListener('click', plotClickHandler2);
+            canvas2.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos2 = { x: -1, y: -1 };
+            drawGraph2(false);
+
+            feedbackBox2.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution2_timeToDist(90, () => {
+                // Setup for question (iii)
+                feedbackBox2.innerHTML = '<b>கேள்வி (iii)</b>: 300 கி.மீ. பயணிக்க ஆகும் நேரத்தைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+                plotToolActivator2.querySelector('span').textContent = 'y = 300 இல் மதிப்பைக் கண்டறியவும்';
+                plotToolActivator2.classList.remove('hidden');
+
+                const newActivator = activatorFinger2.cloneNode(true);
+                activatorFinger2.parentNode.replaceChild(newActivator, activatorFinger2);
+                activatorFinger2 = newActivator;
+                
+                activatorFinger2.addEventListener('click', activateDistFinder, { once: true });
+            });
+        } else {
+            feedbackBox2.style.backgroundColor = '#fee2e2';
+            feedbackBox2.style.color = '#b91c1c';
+            feedbackBox2.textContent = 'தவறு. வரைபடத்தில் (90, 0) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox2.style.backgroundColor = '#eef2ff';
+                feedbackBox2.style.color = 'var(--primary-dark)';
+                feedbackBox2.innerHTML = 'வரைபடத்தில் <b>(90, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+    function activateDistFinder() {
+        plotToolActivator2.classList.add('hidden');
+        isToolActive2 = true;
+        waitForDistClick = true;
+        feedbackBox2.innerHTML = 'வரைபடத்தில் <b>(0, 300)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas2.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler2 = (e) => plotMoveForDist(e);
+        touchMoveHandler2 = (e) => plotMoveForDist(e);
+        plotClickHandler2 = (e) => handlePlotClickForDist(e);
+
+        document.addEventListener('mousemove', plotMoveHandler2);
+        document.addEventListener('touchmove', touchMoveHandler2, { passive: false });
+        canvas2.addEventListener('click', plotClickHandler2);
+    }
+    
+    function plotMoveForDist(e) {
+        if (!isToolActive2 || !waitForDistClick) return;
+        e.preventDefault();
+        const rect = canvas2.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding2) / xScale2;
+        let graphY = (canvas2.height - padding2 - rawMouseY) / yScale2;
+
+        graphX = Math.max(0, Math.min(maxX2, graphX));
+        graphY = Math.max(0, Math.min(maxY2, graphY));
+
+        snappedGraphPos2.x = Math.round(graphX);
+        snappedGraphPos2.y = Math.round(graphY);
+
+        mouseCanvasPos2.x = padding2 + snappedGraphPos2.x * xScale2;
+        mouseCanvasPos2.y = canvas2.height - padding2 - snappedGraphPos2.y * yScale2;
+        
+        isNearTarget2 = (snappedGraphPos2.x === 0 && snappedGraphPos2.y === 300);
+        drawGraph2(false);
+    }
+
+    function handlePlotClickForDist(e) {
+        if (!isToolActive2 || !waitForDistClick) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget2) {
+            isToolActive2 = false;
+            waitForDistClick = false;
+            document.removeEventListener('mousemove', plotMoveHandler2);
+            document.removeEventListener('touchmove', touchMoveHandler2);
+            canvas2.removeEventListener('click', plotClickHandler2);
+            canvas2.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos2 = { x: -1, y: -1 };
+            drawGraph2(false);
+
+            feedbackBox2.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution2_distToTime(300, () => {
+                isAnimating2 = false;
+                questionsSection2.classList.remove('hidden');
+                resultBox2_k.textContent = 'k = y/x = 50 கி.மீ / 60 நிமிடங்கள் = 5/6';
+                handleTimeSlider();
+                handleDistSlider();
+                feedbackBox2.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
+                drawGraph2();
+            });
+        } else {
+             feedbackBox2.style.backgroundColor = '#fee2e2';
+            feedbackBox2.style.color = '#b91c1c';
+            feedbackBox2.textContent = 'தவறு. வரைபடத்தில் (0, 300) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox2.style.backgroundColor = '#eef2ff';
+                feedbackBox2.style.color = 'var(--primary-dark)';
+                feedbackBox2.innerHTML = 'வரைபடத்தில் <b>(0, 300)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+
+    function animateSolution2_timeToDist(time, onComplete) {
+        const distance = time * proportionalityConstant;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating2 = true;
+
+        function animateVertical(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+            
+            drawGraph2(false); 
+
+            const x_canvas = padding2 + time * xScale2;
+            const y_start_canvas = canvas2.height - padding2;
+            const y_target_canvas = canvas2.height - padding2 - distance * yScale2;
+            const y_current_canvas = y_start_canvas + (y_target_canvas - y_start_canvas) * percentage;
+
+            ctx2.beginPath();
+            ctx2.setLineDash([5, 5]);
+            ctx2.strokeStyle = '#10b981';
+            ctx2.lineWidth = 2;
+            ctx2.moveTo(x_canvas, y_start_canvas);
+            ctx2.lineTo(x_canvas, y_current_canvas);
+            ctx2.stroke();
+            ctx2.setLineDash([]);
+            
+            if (progress < duration) {
+                requestAnimationFrame(animateVertical);
+            } else {
+                startTime = null;
+                requestAnimationFrame(animateHorizontal);
+            }
+        }
+
+        function animateHorizontal(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+
+            drawGraph2(false);
+            
+            const x_canvas = padding2 + time * xScale2;
+            const y_canvas_intersect = canvas2.height - padding2 - distance * yScale2;
+            ctx2.beginPath();
+            ctx2.setLineDash([5, 5]);
+            ctx2.strokeStyle = '#10b981';
+            ctx2.lineWidth = 2;
+            ctx2.moveTo(x_canvas, canvas2.height - padding2);
+            ctx2.lineTo(x_canvas, y_canvas_intersect);
+            ctx2.stroke();
+
+            const x_start_canvas = x_canvas;
+            const x_target_canvas = padding2;
+            const x_current_canvas = x_start_canvas + (x_target_canvas - x_start_canvas) * percentage;
+
+            ctx2.moveTo(x_start_canvas, y_canvas_intersect);
+            ctx2.lineTo(x_current_canvas, y_canvas_intersect);
+            ctx2.stroke();
+            ctx2.setLineDash([]);
+            drawPoint2(time, distance, '#10b981', 8);
+
+            if (progress < duration) {
+                requestAnimationFrame(animateHorizontal);
+            } else {
+                isAnimating2 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animateVertical);
+    }
+
+    function animateSolution2_distToTime(distance, onComplete) {
+        const time = distance / proportionalityConstant;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating2 = true;
+
+        function animateHorizontal(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+            
+            drawGraph2(false);
+            drawTimeSliderVisuals(); // Redraw the first solution statically
+
+            const y_canvas = canvas2.height - padding2 - distance * yScale2;
+            const x_start_canvas = padding2;
+            const x_target_canvas = padding2 + time * xScale2;
+            const x_current_canvas = x_start_canvas + (x_target_canvas - x_start_canvas) * percentage;
+            
+            ctx2.beginPath();
+            ctx2.setLineDash([5, 5]);
+            ctx2.strokeStyle = '#0ea5e9';
+            ctx2.lineWidth = 2;
+            ctx2.moveTo(x_start_canvas, y_canvas);
+            ctx2.lineTo(x_current_canvas, y_canvas);
+            ctx2.stroke();
+            ctx2.setLineDash([]);
+            
+            if (progress < duration) {
+                requestAnimationFrame(animateHorizontal);
+            } else {
+                startTime = null;
+                requestAnimationFrame(animateVertical);
+            }
+        }
+
+        function animateVertical(timestamp) {
+             if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+
+            drawGraph2(false);
+            drawTimeSliderVisuals(); 
+
+            const y_canvas = canvas2.height - padding2 - distance * yScale2;
+            const x_canvas_intersect = padding2 + time * xScale2;
+            ctx2.beginPath();
+            ctx2.setLineDash([5, 5]);
+            ctx2.strokeStyle = '#0ea5e9';
+            ctx2.lineWidth = 2;
+            ctx2.moveTo(padding2, y_canvas);
+            ctx2.lineTo(x_canvas_intersect, y_canvas);
+            ctx2.stroke();
+
+            const y_start_canvas = y_canvas;
+            const y_target_canvas = canvas2.height - padding2;
+            const y_current_canvas = y_start_canvas + (y_target_canvas - y_start_canvas) * percentage;
+
+            ctx2.moveTo(x_canvas_intersect, y_start_canvas);
+            ctx2.lineTo(x_canvas_intersect, y_current_canvas);
+            ctx2.stroke();
+            ctx2.setLineDash([]);
+            drawPoint2(time, distance, '#0ea5e9', 8);
+
+            if (progress < duration) {
+                requestAnimationFrame(animateVertical);
+            } else {
+                isAnimating2 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animateHorizontal);
+    }
     
     timeSlider.addEventListener('input', handleTimeSlider);
     distSlider.addEventListener('input', handleDistSlider);
@@ -2719,13 +3046,300 @@
         if (!pointsPlotted3) return;
         lineDrawn3 = true;
         lineBtn3.disabled = true;
-        questionsSection3.classList.remove('hidden');
-        resultBox3_k.textContent = 'இது ஒரு எதிர் மாறுபாடு (xy = k)';
-        handleWorkersSlider3();
-        handleDaysSlider3();
-        feedbackBox3.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
-        drawGraph3();
+        
+        feedbackBox3.innerHTML = '<b>கேள்வி (ii)</b>: 120 வேலையாட்கள் வேலை செய்தால், வேலை முடிய எத்தனை நாட்கள் ஆகும் என்பதை கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+        plotToolActivator3.querySelector('span').textContent = 'x = 120 இல் மதிப்பைக் கண்டறியவும்';
+        plotToolActivator3.classList.remove('hidden');
+
+        const newActivator = activatorFinger3.cloneNode(true);
+        activatorFinger3.parentNode.replaceChild(newActivator, activatorFinger3);
+        activatorFinger3 = newActivator;
+
+        activatorFinger3.addEventListener('click', activateWorkersFinder, { once: true });
     });
+
+     function activateWorkersFinder() {
+        plotToolActivator3.classList.add('hidden');
+        isToolActive3 = true;
+        waitForWorkersClick = true;
+        feedbackBox3.innerHTML = 'வரைபடத்தில் <b>(120, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas3.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler3 = (e) => plotMoveForWorkers(e);
+        touchMoveHandler3 = (e) => plotMoveForWorkers(e);
+        plotClickHandler3 = (e) => handlePlotClickForWorkers(e);
+
+        document.addEventListener('mousemove', plotMoveHandler3);
+        document.addEventListener('touchmove', touchMoveHandler3, { passive: false });
+        canvas3.addEventListener('click', plotClickHandler3);
+    }
+
+    function plotMoveForWorkers(e) {
+        if (!isToolActive3 || !waitForWorkersClick) return;
+        e.preventDefault();
+        const rect = canvas3.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding3) / xScale3;
+        let graphY = (canvas3.height - padding3 - rawMouseY) / yScale3;
+
+        graphX = Math.max(0, Math.min(maxX3, graphX));
+        graphY = Math.max(0, Math.min(maxY3, graphY));
+
+        snappedGraphPos3.x = Math.round(graphX);
+        snappedGraphPos3.y = Math.round(graphY);
+
+        mouseCanvasPos3.x = padding3 + snappedGraphPos3.x * xScale3;
+        mouseCanvasPos3.y = canvas3.height - padding3 - snappedGraphPos3.y * yScale3;
+        
+        isNearTarget3 = (snappedGraphPos3.x === 120 && snappedGraphPos3.y === 0);
+        drawGraph3(false);
+    }
+
+    function handlePlotClickForWorkers(e) {
+        if (!isToolActive3 || !waitForWorkersClick) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget3) {
+            isToolActive3 = false;
+            waitForWorkersClick = false;
+            document.removeEventListener('mousemove', plotMoveHandler3);
+            document.removeEventListener('touchmove', touchMoveHandler3);
+            canvas3.removeEventListener('click', plotClickHandler3);
+            canvas3.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos3 = { x: -1, y: -1 };
+            drawGraph3(false);
+
+            feedbackBox3.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution3_workersToDays(120, () => {
+                feedbackBox3.innerHTML = '<b>கேள்வி (iii)</b>: வேலையானது 200 நாட்களில் முடிய வேண்டும் எனில், எத்தனை வேலையாட்கள் தேவை என்பதைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+                plotToolActivator3.querySelector('span').textContent = 'y = 200 இல் மதிப்பைக் கண்டறியவும்';
+                plotToolActivator3.classList.remove('hidden');
+
+                const newActivator = activatorFinger3.cloneNode(true);
+                activatorFinger3.parentNode.replaceChild(newActivator, activatorFinger3);
+                activatorFinger3 = newActivator;
+                
+                activatorFinger3.addEventListener('click', activateDaysFinder, { once: true });
+            });
+        } else {
+            feedbackBox3.style.backgroundColor = '#fee2e2';
+            feedbackBox3.style.color = '#b91c1c';
+            feedbackBox3.textContent = 'தவறு. வரைபடத்தில் (120, 0) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox3.style.backgroundColor = '#eef2ff';
+                feedbackBox3.style.color = 'var(--primary-dark)';
+                feedbackBox3.innerHTML = 'வரைபடத்தில் <b>(120, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+    function activateDaysFinder() {
+        plotToolActivator3.classList.add('hidden');
+        isToolActive3 = true;
+        waitForDaysClick = true;
+        feedbackBox3.innerHTML = 'வரைபடத்தில் <b>(0, 200)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas3.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler3 = (e) => plotMoveForDays(e);
+        touchMoveHandler3 = (e) => plotMoveForDays(e);
+        plotClickHandler3 = (e) => handlePlotClickForDays(e);
+
+        document.addEventListener('mousemove', plotMoveHandler3);
+        document.addEventListener('touchmove', touchMoveHandler3, { passive: false });
+        canvas3.addEventListener('click', plotClickHandler3);
+    }
+
+    function plotMoveForDays(e) {
+        if (!isToolActive3 || !waitForDaysClick) return;
+        e.preventDefault();
+        const rect = canvas3.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding3) / xScale3;
+        let graphY = (canvas3.height - padding3 - rawMouseY) / yScale3;
+
+        graphX = Math.max(0, Math.min(maxX3, graphX));
+        graphY = Math.max(0, Math.min(maxY3, graphY));
+
+        snappedGraphPos3.x = Math.round(graphX);
+        snappedGraphPos3.y = Math.round(graphY);
+
+        mouseCanvasPos3.x = padding3 + snappedGraphPos3.x * xScale3;
+        mouseCanvasPos3.y = canvas3.height - padding3 - snappedGraphPos3.y * yScale3;
+        
+        isNearTarget3 = (snappedGraphPos3.x === 0 && snappedGraphPos3.y === 200);
+        drawGraph3(false);
+    }
+
+     function handlePlotClickForDays(e) {
+        if (!isToolActive3 || !waitForDaysClick) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget3) {
+            isToolActive3 = false;
+            waitForDaysClick = false;
+            document.removeEventListener('mousemove', plotMoveHandler3);
+            document.removeEventListener('touchmove', touchMoveHandler3);
+            canvas3.removeEventListener('click', plotClickHandler3);
+            canvas3.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos3 = { x: -1, y: -1 };
+            drawGraph3(false);
+
+            feedbackBox3.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution3_daysToWorkers(200, () => {
+                isAnimating3 = false;
+                questionsSection3.classList.remove('hidden');
+                resultBox3_k.textContent = 'இது ஒரு எதிர் மாறுபாடு (xy = k)';
+                handleWorkersSlider3();
+                handleDaysSlider3();
+                feedbackBox3.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
+                drawGraph3();
+            });
+        } else {
+             feedbackBox3.style.backgroundColor = '#fee2e2';
+            feedbackBox3.style.color = '#b91c1c';
+            feedbackBox3.textContent = 'தவறு. வரைபடத்தில் (0, 200) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox3.style.backgroundColor = '#eef2ff';
+                feedbackBox3.style.color = 'var(--primary-dark)';
+                feedbackBox3.innerHTML = 'வரைபடத்தில் <b>(0, 200)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+
+     function animateSolution3_workersToDays(workers, onComplete) {
+        const days = inverseConstant / workers;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating3 = true;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / (duration * 2), 1);
+            
+            drawGraph3(false); 
+
+            const x_canvas = padding3 + workers * xScale3;
+            const y_intersect_canvas = canvas3.height - padding3 - days * yScale3;
+            
+            if (percentage <= 0.5) { // Animate vertical line
+                const p = percentage * 2;
+                const y_start_canvas = canvas3.height - padding3;
+                const y_current_canvas = y_start_canvas + (y_intersect_canvas - y_start_canvas) * p;
+                ctx3.beginPath();
+                ctx3.setLineDash([5, 5]);
+                ctx3.strokeStyle = '#10b981';
+                ctx3.lineWidth = 2;
+                ctx3.moveTo(x_canvas, y_start_canvas);
+                ctx3.lineTo(x_canvas, y_current_canvas);
+                ctx3.stroke();
+            } else { // Animate horizontal line
+                drawPoint3(workers, days, '#10b981', 8);
+                const p = (percentage - 0.5) * 2;
+                // Draw static vertical line
+                ctx3.beginPath();
+                ctx3.setLineDash([5, 5]);
+                ctx3.strokeStyle = '#10b981';
+                ctx3.lineWidth = 2;
+                ctx3.moveTo(x_canvas, canvas3.height - padding3);
+                ctx3.lineTo(x_canvas, y_intersect_canvas);
+
+                // Animate horizontal
+                const x_start_canvas = x_canvas;
+                const x_target_canvas = padding3;
+                const x_current_canvas = x_start_canvas + (x_target_canvas - x_start_canvas) * p;
+                ctx3.moveTo(x_start_canvas, y_intersect_canvas);
+                ctx3.lineTo(x_current_canvas, y_intersect_canvas);
+                ctx3.stroke();
+            }
+             ctx3.setLineDash([]);
+            
+            if (progress < (duration*2)) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimating3 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function animateSolution3_daysToWorkers(days, onComplete) {
+        const workers = inverseConstant / days;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating3 = true;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / (duration * 2), 1);
+            
+            drawGraph3(false);
+            // Draw previous animation statically
+            drawWorkersSliderVisuals();
+
+
+            const y_canvas = canvas3.height - padding3 - days * yScale3;
+            const x_intersect_canvas = padding3 + workers * xScale3;
+            
+            if (percentage <= 0.5) { // Animate horizontal line
+                const p = percentage * 2;
+                const x_start_canvas = padding3;
+                const x_current_canvas = x_start_canvas + (x_intersect_canvas - x_start_canvas) * p;
+                ctx3.beginPath();
+                ctx3.setLineDash([5, 5]);
+                ctx3.strokeStyle = '#0ea5e9';
+                ctx3.lineWidth = 2;
+                ctx3.moveTo(x_start_canvas, y_canvas);
+                ctx3.lineTo(x_current_canvas, y_canvas);
+                ctx3.stroke();
+            } else { // Animate vertical line
+                drawPoint3(workers, days, '#0ea5e9', 8);
+                const p = (percentage - 0.5) * 2;
+                // Draw static horizontal line
+                ctx3.beginPath();
+                ctx3.setLineDash([5, 5]);
+                ctx3.strokeStyle = '#0ea5e9';
+                ctx3.lineWidth = 2;
+                ctx3.moveTo(padding3, y_canvas);
+                ctx3.lineTo(x_intersect_canvas, y_canvas);
+                // Animate vertical
+                const y_start_canvas = y_canvas;
+                const y_target_canvas = canvas3.height - padding3;
+                const y_current_canvas = y_start_canvas + (y_target_canvas - y_start_canvas) * p;
+                ctx3.moveTo(x_intersect_canvas, y_start_canvas);
+                ctx3.lineTo(x_intersect_canvas, y_current_canvas);
+                ctx3.stroke();
+            }
+            ctx3.setLineDash([]);
+            
+            if (progress < (duration*2)) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimating3 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
     
     workersSlider3.addEventListener('input', handleWorkersSlider3);
     daysSlider3.addEventListener('input', handleDaysSlider3);
@@ -2814,12 +3428,294 @@
         if (!pointsPlotted4) return;
         lineDrawn4 = true;
         lineBtn4.disabled = true;
-        questionsSection4.classList.remove('hidden');
-        handleXSlider4();
-        handleYSlider4();
-        feedbackBox4.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
-        drawGraph4();
+        
+        feedbackBox4.innerHTML = '<b>கேள்வி (i)</b>: x = 3 எனில் y-ன் மதிப்பைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+        plotToolActivator4.querySelector('span').textContent = 'x = 3 இல் மதிப்பைக் கண்டறியவும்';
+        plotToolActivator4.classList.remove('hidden');
+
+        const newActivator = activatorFinger4.cloneNode(true);
+        activatorFinger4.parentNode.replaceChild(newActivator, activatorFinger4);
+        activatorFinger4 = newActivator;
+
+        activatorFinger4.addEventListener('click', activateXFinder4, { once: true });
     });
+
+    function activateXFinder4() {
+        plotToolActivator4.classList.add('hidden');
+        isToolActive4 = true;
+        waitForXClick4 = true;
+        feedbackBox4.innerHTML = 'வரைபடத்தில் <b>(3, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas4.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler4 = (e) => plotMoveForX4(e);
+        touchMoveHandler4 = (e) => plotMoveForX4(e);
+        plotClickHandler4 = (e) => handlePlotClickForX4(e);
+
+        document.addEventListener('mousemove', plotMoveHandler4);
+        document.addEventListener('touchmove', touchMoveHandler4, { passive: false });
+        canvas4.addEventListener('click', plotClickHandler4);
+    }
+
+    function plotMoveForX4(e) {
+        if (!isToolActive4 || !waitForXClick4) return;
+        e.preventDefault();
+        const rect = canvas4.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding4) / xScale4;
+        let graphY = (canvas4.height - padding4 - rawMouseY) / yScale4;
+
+        graphX = Math.max(0, Math.min(maxX4, graphX));
+        graphY = Math.max(0, Math.min(maxY4, graphY));
+
+        snappedGraphPos4.x = Math.round(graphX);
+        snappedGraphPos4.y = Math.round(graphY);
+
+        mouseCanvasPos4.x = padding4 + snappedGraphPos4.x * xScale4;
+        mouseCanvasPos4.y = canvas4.height - padding4 - snappedGraphPos4.y * yScale4;
+        
+        isNearTarget4 = (snappedGraphPos4.x === 3 && snappedGraphPos4.y === 0);
+        drawGraph4(false);
+    }
+
+    function handlePlotClickForX4(e) {
+        if (!isToolActive4 || !waitForXClick4) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget4) {
+            isToolActive4 = false;
+            waitForXClick4 = false;
+            document.removeEventListener('mousemove', plotMoveHandler4);
+            document.removeEventListener('touchmove', touchMoveHandler4);
+            canvas4.removeEventListener('click', plotClickHandler4);
+            canvas4.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos4 = { x: -1, y: -1 };
+            drawGraph4(false);
+
+            feedbackBox4.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution4_xToY(3, () => {
+                feedbackBox4.innerHTML = '<b>கேள்வி (ii)</b>: y = 6 எனில் x-ன் மதிப்பைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
+                plotToolActivator4.querySelector('span').textContent = 'y = 6 இல் மதிப்பைக் கண்டறியவும்';
+                plotToolActivator4.classList.remove('hidden');
+
+                const newActivator = activatorFinger4.cloneNode(true);
+                activatorFinger4.parentNode.replaceChild(newActivator, activatorFinger4);
+                activatorFinger4 = newActivator;
+                
+                activatorFinger4.addEventListener('click', activateYFinder4, { once: true });
+            });
+        } else {
+            feedbackBox4.style.backgroundColor = '#fee2e2';
+            feedbackBox4.style.color = '#b91c1c';
+            feedbackBox4.textContent = 'தவறு. வரைபடத்தில் (3, 0) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox4.style.backgroundColor = '#eef2ff';
+                feedbackBox4.style.color = 'var(--primary-dark)';
+                feedbackBox4.innerHTML = 'வரைபடத்தில் <b>(3, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+     function activateYFinder4() {
+        plotToolActivator4.classList.add('hidden');
+        isToolActive4 = true;
+        waitForYClick4 = true;
+        feedbackBox4.innerHTML = 'வரைபடத்தில் <b>(0, 6)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas4.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler4 = (e) => plotMoveForY4(e);
+        touchMoveHandler4 = (e) => plotMoveForY4(e);
+        plotClickHandler4 = (e) => handlePlotClickForY4(e);
+
+        document.addEventListener('mousemove', plotMoveHandler4);
+        document.addEventListener('touchmove', touchMoveHandler4, { passive: false });
+        canvas4.addEventListener('click', plotClickHandler4);
+    }
+    
+    function plotMoveForY4(e) {
+        if (!isToolActive4 || !waitForYClick4) return;
+        e.preventDefault();
+        const rect = canvas4.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
+        else { clientX = e.clientX; clientY = e.clientY; }
+        
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding4) / xScale4;
+        let graphY = (canvas4.height - padding4 - rawMouseY) / yScale4;
+
+        graphX = Math.max(0, Math.min(maxX4, graphX));
+        graphY = Math.max(0, Math.min(maxY4, graphY));
+
+        snappedGraphPos4.x = Math.round(graphX);
+        snappedGraphPos4.y = Math.round(graphY);
+
+        mouseCanvasPos4.x = padding4 + snappedGraphPos4.x * xScale4;
+        mouseCanvasPos4.y = canvas4.height - padding4 - snappedGraphPos4.y * yScale4;
+        
+        isNearTarget4 = (snappedGraphPos4.x === 0 && snappedGraphPos4.y === 6);
+        drawGraph4(false);
+    }
+
+     function handlePlotClickForY4(e) {
+        if (!isToolActive4 || !waitForYClick4) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget4) {
+            isToolActive4 = false;
+            waitForYClick4 = false;
+            document.removeEventListener('mousemove', plotMoveHandler4);
+            document.removeEventListener('touchmove', touchMoveHandler4);
+            canvas4.removeEventListener('click', plotClickHandler4);
+            canvas4.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos4 = { x: -1, y: -1 };
+            drawGraph4(false);
+
+            feedbackBox4.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution4_yToX(6, () => {
+                isAnimating4 = false;
+                questionsSection4.classList.remove('hidden');
+                handleXSlider4();
+                handleYSlider4();
+                feedbackBox4.textContent = 'சிறப்பு! இப்போது ஸ்லைடர்களைப் பயன்படுத்தி கேள்விகளுக்கு விடையளிக்கவும்.';
+                drawGraph4();
+            });
+        } else {
+             feedbackBox4.style.backgroundColor = '#fee2e2';
+            feedbackBox4.style.color = '#b91c1c';
+            feedbackBox4.textContent = 'தவறு. வரைபடத்தில் (0, 6) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox4.style.backgroundColor = '#eef2ff';
+                feedbackBox4.style.color = 'var(--primary-dark)';
+                feedbackBox4.innerHTML = 'வரைபடத்தில் <b>(0, 6)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+
+    function animateSolution4_xToY(xVal, onComplete) {
+        const yVal = inverseConstant4 / xVal;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating4 = true;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / (duration * 2), 1);
+            
+            drawGraph4(false); 
+
+            const x_canvas = padding4 + xVal * xScale4;
+            const y_intersect_canvas = canvas4.height - padding4 - yVal * yScale4;
+            
+            if (percentage <= 0.5) { // Animate vertical line
+                const p = percentage * 2;
+                const y_start_canvas = canvas4.height - padding4;
+                const y_current_canvas = y_start_canvas + (y_intersect_canvas - y_start_canvas) * p;
+                ctx4.beginPath();
+                ctx4.setLineDash([5, 5]);
+                ctx4.strokeStyle = '#10b981';
+                ctx4.lineWidth = 2;
+                ctx4.moveTo(x_canvas, y_start_canvas);
+                ctx4.lineTo(x_canvas, y_current_canvas);
+                ctx4.stroke();
+            } else { // Animate horizontal line
+                drawPoint4(xVal, yVal, '#10b981', 8);
+                const p = (percentage - 0.5) * 2;
+                ctx4.beginPath();
+                ctx4.setLineDash([5, 5]);
+                ctx4.strokeStyle = '#10b981';
+                ctx4.lineWidth = 2;
+                ctx4.moveTo(x_canvas, canvas4.height - padding4);
+                ctx4.lineTo(x_canvas, y_intersect_canvas);
+
+                const x_start_canvas = x_canvas;
+                const x_target_canvas = padding4;
+                const x_current_canvas = x_start_canvas + (x_target_canvas - x_start_canvas) * p;
+                ctx4.moveTo(x_start_canvas, y_intersect_canvas);
+                ctx4.lineTo(x_current_canvas, y_intersect_canvas);
+                ctx4.stroke();
+            }
+             ctx4.setLineDash([]);
+            
+            if (progress < (duration*2)) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimating4 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function animateSolution4_yToX(yVal, onComplete) {
+        const xVal = inverseConstant4 / yVal;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating4 = true;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / (duration * 2), 1);
+            
+            drawGraph4(false);
+            drawXSliderVisuals4(); // Redraw previous solution
+
+            const y_canvas = canvas4.height - padding4 - yVal * yScale4;
+            const x_intersect_canvas = padding4 + xVal * xScale4;
+            
+            if (percentage <= 0.5) { // Animate horizontal line
+                const p = percentage * 2;
+                const x_start_canvas = padding4;
+                const x_current_canvas = x_start_canvas + (x_intersect_canvas - x_start_canvas) * p;
+                ctx4.beginPath();
+                ctx4.setLineDash([5, 5]);
+                ctx4.strokeStyle = '#0ea5e9';
+                ctx4.lineWidth = 2;
+                ctx4.moveTo(x_start_canvas, y_canvas);
+                ctx4.lineTo(x_current_canvas, y_canvas);
+                ctx4.stroke();
+            } else { // Animate vertical line
+                drawPoint4(xVal, yVal, '#0ea5e9', 8);
+                const p = (percentage - 0.5) * 2;
+                ctx4.beginPath();
+                ctx4.setLineDash([5, 5]);
+                ctx4.strokeStyle = '#0ea5e9';
+                ctx4.lineWidth = 2;
+                ctx4.moveTo(padding4, y_canvas);
+                ctx4.lineTo(x_intersect_canvas, y_canvas);
+
+                const y_start_canvas = y_canvas;
+                const y_target_canvas = canvas4.height - padding4;
+                const y_current_canvas = y_start_canvas + (y_target_canvas - y_start_canvas) * p;
+                ctx4.moveTo(x_intersect_canvas, y_start_canvas);
+                ctx4.lineTo(x_intersect_canvas, y_current_canvas);
+                ctx4.stroke();
+            }
+            ctx4.setLineDash([]);
+            
+            if (progress < (duration*2)) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimating4 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
     
     xSlider4.addEventListener('input', handleXSlider4);
     ySlider4.addEventListener('input', handleYSlider4);
