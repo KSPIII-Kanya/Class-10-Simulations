@@ -131,9 +131,9 @@
         }
         
         .card.disabled:hover {
-             transform: none;
-             box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
-             border-color: transparent;
+              transform: none;
+              box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -4px var(--shadow-color);
+              border-color: transparent;
         }
 
         /* Simulation Screen Styles */
@@ -369,18 +369,18 @@
             min-height: 400px;
             height: 100%;
         }
-        #graphCanvas, #graphCanvas2, #graphCanvas3, #graphCanvas4 {
+        #graphCanvas, #graphCanvas2, #graphCanvas3, #graphCanvas4, #graphCanvas5 {
             background-color: var(--white);
             border-radius: 0.75rem;
             max-width: 100%;
             max-height: 100%;
         }
         
-        #graphCanvas.plotting-active, #graphCanvas2.plotting-active, #graphCanvas3.plotting-active, #graphCanvas4.plotting-active {
+        #graphCanvas.plotting-active, #graphCanvas2.plotting-active, #graphCanvas3.plotting-active, #graphCanvas4.plotting-active, #graphCanvas5.plotting-active {
             cursor: none;
         }
         
-        #plot-tool-activator, #plot-tool-activator2, #plot-tool-activator3, #plot-tool-activator4 {
+        #plot-tool-activator, #plot-tool-activator2, #plot-tool-activator3, #plot-tool-activator4, #plot-tool-activator5 {
             text-align: center;
             margin-top: 1rem;
             background-color: #eef2ff;
@@ -391,10 +391,10 @@
             transition: background-color 0.2s;
             -webkit-tap-highlight-color: transparent;
         }
-        #plot-tool-activator:hover, #plot-tool-activator2:hover, #plot-tool-activator3:hover, #plot-tool-activator4:hover {
+        #plot-tool-activator:hover, #plot-tool-activator2:hover, #plot-tool-activator3:hover, #plot-tool-activator4:hover, #plot-tool-activator5:hover {
             background-color: #e0e7ff;
         }
-        #activatorFinger, #activatorFinger2, #activatorFinger3, #activatorFinger4 {
+        #activatorFinger, #activatorFinger2, #activatorFinger3, #activatorFinger4, #activatorFinger5 {
             font-size: 2.5rem;
             user-select: none;
         }
@@ -455,6 +455,7 @@
                     <button class="tab-btn" data-tab="model2">மாதிரி 2</button>
                     <button class="tab-btn" data-tab="model3">மாதிரி 3</button>
                     <button class="tab-btn" data-tab="model4">மாதிரி 4</button>
+                    <button class="tab-btn" data-tab="model5">மாதிரி 5</button>
                 </div>
                 <!-- Model 1 Content -->
                 <div id="model1" class="tab-content active">
@@ -735,6 +736,60 @@
                         </div>
                     </div>
                 </div>
+                <!-- Model 5 Content -->
+                <div id="model5" class="tab-content">
+                    <div class="simulation-grid">
+                        <div class="controls-panel panel">
+                            <h2>மாரத்தான் ஓட்டம்</h2>
+                            <p>
+                                <b>நிஷாந்த் 12 கி.மீ மாரத்தான் ஓட்டத்தில் வெற்றியாளர். அவர் மணிக்கு 12 கி.மீ வேகத்தில் ஓடி 1 மணி நேரத்தில் இலக்கை அடைந்தார். மற்ற ஓட்டப்பந்தய வீரர்களின் வேகம் மற்றும் நேரம் கீழே கொடுக்கப்பட்டுள்ளது.</b>
+                            </p>
+                            
+                            <p class="formula"><b>சூத்திரம்: வேகம் × நேரம் = 12 கி.மீ</b></p>
+
+                            <table class="data-table">
+                                <thead>
+                                    <tr><th>ஓட்டப்பந்தய வீரர்</th><th>வேகம் (x) கி.மீ/மணி</th><th>நேரம் (y) மணி</th></tr>
+                                </thead>
+                                <tbody id="dataTableBody5">
+                                    <!-- Data will be populated by script -->
+                                </tbody>
+                            </table>
+                            
+                            <div id="plot-tool-activator5" class="hidden">
+                                <div id="activatorFinger5">👆</div>
+                                <span>புள்ளியைக் குறிக்க இதை அழுத்தவும்</span>
+                            </div>
+
+                            <div class="btn-group">
+                                <button id="plotBtn5" class="btn btn-primary">1. புள்ளிகளைக் குறிக்கவும்</button>
+                                <button id="lineBtn5" class="btn btn-primary" disabled>2. வளைகோடு வரையவும்</button>
+                            </div>
+                            
+                            <div id="questionsSection5" class="hidden">
+                                <div class="question-box">
+                                    <p>கெளசிக் மணிக்கு 2.4 கி.மீ/மணி வேகத்தில் சென்றால், அவர் எடுத்துக்கொண்ட நேரத்தைக் காண்க.</p>
+                                    <div class="slider-container">
+                                        <label for="speedSlider5">வேகத்தை தேர்வு செய்யவும்: <span id="sliderValue5_speed">2.4</span> கி.மீ/மணி</label>
+                                        <input type="range" id="speedSlider5" min="1" max="12" value="2.4" step="0.1">
+                                    </div>
+                                   <div id="resultBox5_time" class="result-box"></div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                                <button id="resetBtn5" class="btn btn-secondary" style="flex: 1;">மீட்டமை</button>
+                                <button id="backBtn5" class="btn btn-secondary" style="flex: 1; background-color: #ef4444;">பின் செல்</button>
+                            </div>
+                            <div class="feedback-box" id="feedbackBox5">
+                                வழிமுறைகளுக்கு இங்கே பார்க்கவும்.
+                            </div>
+                        </div>
+                        <div class="canvas-panel panel">
+                            <canvas id="graphCanvas5"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
         <footer class="app-footer">
@@ -836,6 +891,22 @@
     const coordinatesDisplay4 = document.getElementById('coordinatesDisplay4');
     let activatorFinger4 = document.getElementById('activatorFinger4');
 
+    // --- MODEL 5 ELEMENTS ---
+    const backBtn5 = document.getElementById('backBtn5');
+    const canvas5 = document.getElementById('graphCanvas5');
+    const ctx5 = canvas5.getContext('2d');
+    const plotBtn5 = document.getElementById('plotBtn5');
+    const lineBtn5 = document.getElementById('lineBtn5');
+    const questionsSection5 = document.getElementById('questionsSection5');
+    const speedSlider5 = document.getElementById('speedSlider5');
+    const sliderValue5_speed = document.getElementById('sliderValue5_speed');
+    const resultBox5_time = document.getElementById('resultBox5_time');
+    const resetBtn5 = document.getElementById('resetBtn5');
+    const feedbackBox5 = document.getElementById('feedbackBox5');
+    const dataTableBody5 = document.getElementById('dataTableBody5');
+    const plotToolActivator5 = document.getElementById('plot-tool-activator5');
+    let activatorFinger5 = document.getElementById('activatorFinger5');
+
 
     // --- MODEL 1 STATE ---
     let data = [];
@@ -915,11 +986,31 @@
     let xScale4, yScale4;
     const inverseConstant4 = 24;
 
+    // --- MODEL 5 STATE ---
+    let data5 = [];
+    let pointsPlotted5 = false;
+    let lineDrawn5 = false;
+    let graphDrawn5 = false;
+    let plottingMode5 = false;
+    let currentPointIndex5 = 0;
+    let userPlottedPoints5 = [];
+    let mouseCanvasPos5 = { x: -1, y: -1 };
+    let snappedGraphPos5 = { x: -1, y: -1 };
+    let isNearTarget5 = false;
+    let isToolActive5 = false;
+    let isAnimating5 = false;
+    let waitForSpeedClick = false;
+    let padding5 = 60;
+    let maxX5 = 13, maxY5 = 7; // Speed (x) up to 12, Time (y) up to 6. Give some buffer.
+    let xScale5, yScale5;
+    const inverseConstant5 = 12;
+
     // --- EVENT HANDLER REFERENCES ---
     let plotMoveHandler1, touchMoveHandler1, plotClickHandler1;
     let plotMoveHandler2, touchMoveHandler2, plotClickHandler2;
     let plotMoveHandler3, touchMoveHandler3, plotClickHandler3;
     let plotMoveHandler4, touchMoveHandler4, plotClickHandler4;
+    let plotMoveHandler5, touchMoveHandler5, plotClickHandler5;
 
     // --- GENERAL FUNCTIONS ---
 
@@ -947,6 +1038,11 @@
                 initModel4();
             }
             resizeCanvas4();
+        } else if (targetTabId === 'model5') {
+            if (data5.length === 0 && !plottingMode5) {
+                initModel5();
+            }
+            resizeCanvas5();
         }
     }
     
@@ -956,6 +1052,7 @@
         else if (activeTab === 'model2') resizeCanvas2();
         else if (activeTab === 'model3') resizeCanvas3();
         else if (activeTab === 'model4') resizeCanvas4();
+        else if (activeTab === 'model5') resizeCanvas5();
     });
 
     // --- MODEL 1: CIRCLE SIMULATION ---
@@ -1059,18 +1156,18 @@
         ctx.textBaseline = 'middle';
         for (let i = 0; i <= maxY; i += 1) {
              const y = canvas.height - padding - i * yScale;
-             if (i > 0 && i % 2 === 0) { // Label every 2 units for clarity
-                 ctx.fillStyle = '#1e293b';
-                 ctx.fillText(i, padding - 10, y);
-             }
-             if (i > 0) {
-                 ctx.beginPath();
-                 ctx.moveTo(padding, y);
-                 ctx.lineTo(canvas.width - padding, y);
-                 ctx.lineWidth = 1;
-                 ctx.strokeStyle = '#e2e8f0';
-                 ctx.stroke();
-             }
+              if (i > 0 && i % 2 === 0) { // Label every 2 units for clarity
+                   ctx.fillStyle = '#1e293b';
+                   ctx.fillText(i, padding - 10, y);
+              }
+              if (i > 0) {
+                   ctx.beginPath();
+                   ctx.moveTo(padding, y);
+                   ctx.lineTo(canvas.width - padding, y);
+                   ctx.lineWidth = 1;
+                   ctx.strokeStyle = '#e2e8f0';
+                   ctx.stroke();
+              }
         }
         
         userPlottedPoints.forEach(p => drawPoint(p.d, p.c, '#4f46e5', 8));
@@ -1197,42 +1294,48 @@
     function plotMove(e, model) {
         let currentCanvas, currentPadding, currentXScale, currentYScale, currentMaxX, currentMaxY;
         let currentSnappedPos, currentMousePos, currentTarget, snapValueX, snapValueY;
-
-        if (model === 1) {
-            if (!isToolActive) return;
-            currentCanvas = canvas; currentPadding = padding;
-            currentXScale = xScale; currentYScale = yScale;
-            currentMaxX = maxX; currentMaxY = maxY;
-            currentSnappedPos = snappedGraphPos; currentMousePos = mouseCanvasPos;
-            currentTarget = data[currentPointIndex];
-            snapValueX = 10; snapValueY = 10;
-        } else if (model === 2) {
-            if (!isToolActive2) return;
-            currentCanvas = canvas2; currentPadding = padding2;
-            currentXScale = xScale2; currentYScale = yScale2;
-            currentMaxX = maxX2; currentMaxY = maxY2;
-            currentSnappedPos = snappedGraphPos2; currentMousePos = mouseCanvasPos2;
-            currentTarget = data2[currentPointIndex2];
-            snapValueX = 1; snapValueY = 1;
-        } else if (model === 3) { 
-            if (!isToolActive3) return;
-            currentCanvas = canvas3; currentPadding = padding3;
-            currentXScale = xScale3; currentYScale = yScale3;
-            currentMaxX = maxX3; currentMaxY = maxY3;
-            currentSnappedPos = snappedGraphPos3; currentMousePos = mouseCanvasPos3;
-            currentTarget = data3[currentPointIndex3];
-            snapValueX = 1; snapValueY = 1; 
-        } else { // model 4
-             if (!isToolActive4) return;
-            currentCanvas = canvas4; currentPadding = padding4;
-            currentXScale = xScale4; currentYScale = yScale4;
-            currentMaxX = maxX4; currentMaxY = maxY4;
-            currentSnappedPos = snappedGraphPos4; currentMousePos = mouseCanvasPos4;
-            currentTarget = data4[currentPointIndex4];
-            snapValueX = 1; snapValueY = 1; 
-        }
+        let currentIsToolActive, currentIsNearTargetRef;
 
         e.preventDefault();
+        
+        switch(model) {
+            case 1:
+                if (!isToolActive) return;
+                currentCanvas = canvas; currentPadding = padding; currentXScale = xScale; currentYScale = yScale;
+                currentMaxX = maxX; currentMaxY = maxY; currentSnappedPos = snappedGraphPos;
+                currentMousePos = mouseCanvasPos; currentTarget = data[currentPointIndex];
+                snapValueX = 10; snapValueY = 10;
+                break;
+            case 2:
+                if (!isToolActive2) return;
+                currentCanvas = canvas2; currentPadding = padding2; currentXScale = xScale2; currentYScale = yScale2;
+                currentMaxX = maxX2; currentMaxY = maxY2; currentSnappedPos = snappedGraphPos2;
+                currentMousePos = mouseCanvasPos2; currentTarget = data2[currentPointIndex2];
+                snapValueX = 1; snapValueY = 1;
+                break;
+            case 3:
+                if (!isToolActive3) return;
+                currentCanvas = canvas3; currentPadding = padding3; currentXScale = xScale3; currentYScale = yScale3;
+                currentMaxX = maxX3; currentMaxY = maxY3; currentSnappedPos = snappedGraphPos3;
+                currentMousePos = mouseCanvasPos3; currentTarget = data3[currentPointIndex3];
+                snapValueX = 1; snapValueY = 1;
+                break;
+            case 4:
+                if (!isToolActive4) return;
+                currentCanvas = canvas4; currentPadding = padding4; currentXScale = xScale4; currentYScale = yScale4;
+                currentMaxX = maxX4; currentMaxY = maxY4; currentSnappedPos = snappedGraphPos4;
+                currentMousePos = mouseCanvasPos4; currentTarget = data4[currentPointIndex4];
+                snapValueX = 1; snapValueY = 1;
+                break;
+            case 5:
+                if (!isToolActive5) return;
+                currentCanvas = canvas5; currentPadding = padding5; currentXScale = xScale5; currentYScale = yScale5;
+                currentMaxX = maxX5; currentMaxY = maxY5; currentSnappedPos = snappedGraphPos5;
+                currentMousePos = mouseCanvasPos5; currentTarget = data5[currentPointIndex5];
+                snapValueX = 1; snapValueY = 1;
+                break;
+        }
+
         const rect = currentCanvas.getBoundingClientRect();
         let clientX, clientY;
         if (e.touches && e.touches.length > 0) {
@@ -1252,50 +1355,30 @@
         currentSnappedPos.x = parseFloat((Math.round(graphX * snapValueX) / snapValueX).toFixed(model === 1 ? 1 : 0));
         currentSnappedPos.y = parseFloat((Math.round(graphY * snapValueY) / snapValueY).toFixed(model === 1 ? 1 : 0));
         
-
         currentMousePos.x = currentPadding + currentSnappedPos.x * currentXScale;
         currentMousePos.y = currentCanvas.height - currentPadding - currentSnappedPos.y * currentYScale;
         
         let targetX, targetY;
-        if (model === 1) targetX = currentTarget.d;
-        else if (model === 2) targetX = currentTarget.t;
-        else targetX = currentTarget.x;
-
-        if (model === 1) targetY = currentTarget.c;
-        else if (model === 2) targetY = currentTarget.d;
-        else targetY = currentTarget.y;
+        if (model === 1) { targetX = currentTarget.d; targetY = currentTarget.c; } 
+        else if (model === 2) { targetX = currentTarget.t; targetY = currentTarget.d; } 
+        else if (model === 5) { targetX = currentTarget.speed; targetY = currentTarget.time; }
+        else { targetX = currentTarget.x; targetY = currentTarget.y; }
         
-        if (model === 1) {
-            isNearTarget = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
-            drawGraph();
-        } else if (model === 2) {
-            isNearTarget2 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
-            drawGraph2();
-        } else if (model === 3){
-            isNearTarget3 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
-            drawGraph3();
-        } else {
-            isNearTarget4 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY);
-            drawGraph4();
-        }
+        if (model === 1) { isNearTarget = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY); drawGraph(); }
+        else if (model === 2) { isNearTarget2 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY); drawGraph2(); }
+        else if (model === 3){ isNearTarget3 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY); drawGraph3(); }
+        else if (model === 4){ isNearTarget4 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY); drawGraph4(); }
+        else if (model === 5){ isNearTarget5 = (currentSnappedPos.x === targetX && currentSnappedPos.y === targetY); drawGraph5(); }
     }
     
     function handlePlotClick(e, model) {
         let currentIsNearTarget;
         
-        if (model === 1) {
-            if (!isToolActive) return;
-            currentIsNearTarget = isNearTarget;
-        } else if (model === 2) {
-            if (!isToolActive2) return;
-            currentIsNearTarget = isNearTarget2;
-        } else if (model === 3) {
-            if (!isToolActive3) return;
-            currentIsNearTarget = isNearTarget3;
-        } else { // model 4
-            if (!isToolActive4) return;
-            currentIsNearTarget = isNearTarget4;
-        }
+        if (model === 1) { if (!isToolActive) return; currentIsNearTarget = isNearTarget; } 
+        else if (model === 2) { if (!isToolActive2) return; currentIsNearTarget = isNearTarget2; } 
+        else if (model === 3) { if (!isToolActive3) return; currentIsNearTarget = isNearTarget3; } 
+        else if (model === 4) { if (!isToolActive4) return; currentIsNearTarget = isNearTarget4; }
+        else if (model === 5) { if (!isToolActive5) return; currentIsNearTarget = isNearTarget5; }
 
         if (e.target.closest('.controls-panel')) return;
         e.preventDefault();
@@ -1306,56 +1389,47 @@
                 currentPointIndex++;
 
                 if (currentPointIndex >= data.length) {
-                    plottingMode = false;
-                    pointsPlotted = true;
+                    plottingMode = false; pointsPlotted = true;
                     feedbackBox.innerHTML = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. <b>இப்போது "நேர்க்கோடு வரையவும்" பொத்தானை அழுத்தவும்.</b>';
                     lineBtn.disabled = false;
                     
                     if (!data.some(p => p.d === 6)) {
-                        // Add the point for the table but don't show the 'c' value yet
                         data.push({ d: 6, c: '?' });
                         updateTable();
                         updateGraphBounds();
                     }
-                } else {
-                    updateFeedbackForPlotting();
-                }
+                } else { updateFeedbackForPlotting(); }
             } else if (model === 2) {
                 userPlottedPoints2.push(data2[currentPointIndex2]);
                 currentPointIndex2++;
                 if (currentPointIndex2 >= data2.length) {
-                    plottingMode2 = false;
-                    pointsPlotted2 = true;
-                    lineBtn2.disabled = false;
+                    plottingMode2 = false; pointsPlotted2 = true; lineBtn2.disabled = false;
                     feedbackBox2.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது நேர்க்கோடு வரையவும்.';
-                } else {
-                    updateFeedbackForPlotting2();
-                }
+                } else { updateFeedbackForPlotting2(); }
             } else if (model === 3) {
                 userPlottedPoints3.push(data3[currentPointIndex3]);
                 currentPointIndex3++;
                 if (currentPointIndex3 >= data3.length) {
-                    plottingMode3 = false;
-                    pointsPlotted3 = true;
-                    lineBtn3.disabled = false;
+                    plottingMode3 = false; pointsPlotted3 = true; lineBtn3.disabled = false;
                     feedbackBox3.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது வளைகோடு வரையவும்.';
-                } else {
-                    updateFeedbackForPlotting3();
-                }
-            } else { // model 4
-                userPlottedPoints4.push(data4[currentPointIndex4]);
-                currentPointIndex4++;
-                if (currentPointIndex4 >= data4.length) {
-                    plottingMode4 = false;
-                    pointsPlotted4 = true;
-                    lineBtn4.disabled = false;
-                    feedbackBox4.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது வளைகோடு வரையவும்.';
-                } else {
-                    updateFeedbackForPlotting4();
-                }
+                } else { updateFeedbackForPlotting3(); }
+            } else if (model === 4) {
+                 userPlottedPoints4.push(data4[currentPointIndex4]);
+                 currentPointIndex4++;
+                 if (currentPointIndex4 >= data4.length) {
+                     plottingMode4 = false; pointsPlotted4 = true; lineBtn4.disabled = false;
+                     feedbackBox4.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது வளைகோடு வரையவும்.';
+                 } else { updateFeedbackForPlotting4(); }
+            } else if (model === 5) {
+                 userPlottedPoints5.push(data5[currentPointIndex5]);
+                 currentPointIndex5++;
+                 if (currentPointIndex5 >= data5.length) {
+                     plottingMode5 = false; pointsPlotted5 = true; lineBtn5.disabled = false;
+                     feedbackBox5.textContent = 'அருமை! எல்லா புள்ளிகளும் குறிக்கப்பட்டன. இப்போது வளைகோடு வரையவும்.';
+                 } else { updateFeedbackForPlotting5(); }
             }
         } else {
-            const fb = (model === 1) ? feedbackBox : (model === 2 ? feedbackBox2 : (model === 3 ? feedbackBox3 : feedbackBox4));
+            const fb = (model === 1) ? feedbackBox : (model === 2 ? feedbackBox2 : (model === 3 ? feedbackBox3 : (model === 4 ? feedbackBox4 : feedbackBox5)));
             fb.style.backgroundColor = '#fee2e2';
             fb.style.color = '#b91c1c';
             fb.textContent = 'தவறான இடம்! சரியான புள்ளியைக் கண்டறியவும்.';
@@ -1367,16 +1441,14 @@
                 else if (model === 2) updateFeedbackForPlotting2();
                 else if (model === 3) updateFeedbackForPlotting3();
                 else if (model === 4) updateFeedbackForPlotting4();
+                else if (model === 5) updateFeedbackForPlotting5();
             }, 2000);
         }
 
         if (model === 1) {
             isToolActive = false;
-            document.removeEventListener('mousemove', plotMoveHandler1);
-            document.removeEventListener('touchmove', touchMoveHandler1);
-            canvas.removeEventListener('click', plotClickHandler1);
-            canvas.classList.remove('plotting-active');
-            mouseCanvasPos = { x: -1, y: -1 };
+            document.removeEventListener('mousemove', plotMoveHandler1); document.removeEventListener('touchmove', touchMoveHandler1); canvas.removeEventListener('click', plotClickHandler1);
+            canvas.classList.remove('plotting-active'); mouseCanvasPos = { x: -1, y: -1 };
             if (plottingMode && currentPointIndex < data.length) {
                 plotToolActivator.classList.remove('hidden');
                 activatorFinger.addEventListener('click', activatePlottingTool, { once: true });
@@ -1384,11 +1456,8 @@
             drawGraph();
         } else if (model === 2) {
             isToolActive2 = false;
-            document.removeEventListener('mousemove', plotMoveHandler2);
-            document.removeEventListener('touchmove', touchMoveHandler2);
-            canvas2.removeEventListener('click', plotClickHandler2);
-            canvas2.classList.remove('plotting-active');
-            mouseCanvasPos2 = { x: -1, y: -1 };
+            document.removeEventListener('mousemove', plotMoveHandler2); document.removeEventListener('touchmove', touchMoveHandler2); canvas2.removeEventListener('click', plotClickHandler2);
+            canvas2.classList.remove('plotting-active'); mouseCanvasPos2 = { x: -1, y: -1 };
             if (plottingMode2 && currentPointIndex2 < data2.length) {
                 plotToolActivator2.classList.remove('hidden');
                 activatorFinger2.addEventListener('click', activatePlottingTool2, { once: true });
@@ -1396,28 +1465,31 @@
             drawGraph2();
         } else if (model === 3) {
              isToolActive3 = false;
-            document.removeEventListener('mousemove', plotMoveHandler3);
-            document.removeEventListener('touchmove', touchMoveHandler3);
-            canvas3.removeEventListener('click', plotClickHandler3);
-            canvas3.classList.remove('plotting-active');
-            mouseCanvasPos3 = { x: -1, y: -1 };
+            document.removeEventListener('mousemove', plotMoveHandler3); document.removeEventListener('touchmove', touchMoveHandler3); canvas3.removeEventListener('click', plotClickHandler3);
+            canvas3.classList.remove('plotting-active'); mouseCanvasPos3 = { x: -1, y: -1 };
             if (plottingMode3 && currentPointIndex3 < data3.length) {
                 plotToolActivator3.classList.remove('hidden');
                 activatorFinger3.addEventListener('click', activatePlottingTool3, { once: true });
             }
             drawGraph3();
-        } else { // model 4
+        } else if (model === 4) {
              isToolActive4 = false;
-            document.removeEventListener('mousemove', plotMoveHandler4);
-            document.removeEventListener('touchmove', touchMoveHandler4);
-            canvas4.removeEventListener('click', plotClickHandler4);
-            canvas4.classList.remove('plotting-active');
-            mouseCanvasPos4 = { x: -1, y: -1 };
+            document.removeEventListener('mousemove', plotMoveHandler4); document.removeEventListener('touchmove', touchMoveHandler4); canvas4.removeEventListener('click', plotClickHandler4);
+            canvas4.classList.remove('plotting-active'); mouseCanvasPos4 = { x: -1, y: -1 };
             if (plottingMode4 && currentPointIndex4 < data4.length) {
                 plotToolActivator4.classList.remove('hidden');
                 activatorFinger4.addEventListener('click', activatePlottingTool4, { once: true });
             }
             drawGraph4();
+        } else if (model === 5) {
+             isToolActive5 = false;
+            document.removeEventListener('mousemove', plotMoveHandler5); document.removeEventListener('touchmove', touchMoveHandler5); canvas5.removeEventListener('click', plotClickHandler5);
+            canvas5.classList.remove('plotting-active'); mouseCanvasPos5 = { x: -1, y: -1 };
+            if (plottingMode5 && currentPointIndex5 < data5.length) {
+                plotToolActivator5.classList.remove('hidden');
+                activatorFinger5.addEventListener('click', activatePlottingTool5, { once: true });
+            }
+            drawGraph5();
         }
         document.body.classList.remove('no-select');
     }
@@ -2553,16 +2625,404 @@
         initModel4();
     }
     
+    // --- MODEL 5: MARATHON SIMULATION ---
+    function initModel5() {
+        data5 = [
+            { name: 'நிஷாந்த்', speed: 12, time: 1, icon: '🏃‍♂️' },
+            { name: 'ஆராதனா', speed: 6, time: 2, icon: '🏃‍♀️' },
+            { name: 'ஜெயந்த்', speed: 4, time: 3, icon: '🏃‍♂️' },
+            { name: 'சத்யா', speed: 3, time: 4, icon: '🏃‍♀️' },
+            { name: 'ஸ்வேதா', speed: 2, time: 6, icon: '🏃‍♀️' }
+        ];
+        
+        pointsPlotted5 = false; lineDrawn5 = false; graphDrawn5 = false; plottingMode5 = false;
+        isToolActive5 = false; isNearTarget5 = false; currentPointIndex5 = 0;
+        isAnimating5 = false; waitForSpeedClick = false;
+        userPlottedPoints5 = [];
+        snappedGraphPos5 = { x: -1, y: -1 };
+
+        plotBtn5.disabled = false;
+        lineBtn5.disabled = true;
+        questionsSection5.classList.add('hidden');
+        speedSlider5.value = 2.4;
+        sliderValue5_speed.textContent = '2.4';
+        
+        feedbackBox5.innerHTML = '<b>வரைபடத்தில் புள்ளிகளைக் குறிக்க, "புள்ளிகளைக் குறிக்கவும்" பொத்தானை அழுத்தவும்.</b>';
+        updateTable5();
+        resizeCanvas5();
+    }
+    
+    function updateTable5() {
+        dataTableBody5.innerHTML = '';
+        data5.forEach(runner => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${runner.icon} ${runner.name}</td><td>${runner.speed}</td><td>${runner.time}</td>`;
+            dataTableBody5.appendChild(row);
+        });
+    }
+    
+    function resizeCanvas5() {
+        const container = canvas5.parentElement;
+        const size = Math.min(container.clientWidth - 20, container.clientHeight - 20, 800);
+        canvas5.width = size;
+        canvas5.height = size;
+        if (graphDrawn5) {
+            updateGraphBounds5();
+            drawGraph5();
+        } else {
+             clearCanvas5();
+        }
+    }
+    
+    function clearCanvas5() {
+        ctx5.clearRect(0, 0, canvas5.width, canvas5.height);
+        ctx5.fillStyle = '#6b7280';
+        ctx5.font = 'bold 16px sans-serif';
+        ctx5.textAlign = 'center';
+        ctx5.fillText('வரைபடத்தை வரையவும்', canvas5.width / 2, canvas5.height / 2);
+    }
+
+    function updateGraphBounds5() {
+        maxX5 = 13; // Speed
+        maxY5 = 7; // Time
+        xScale5 = (canvas5.width - 2 * padding5) / maxX5;
+        yScale5 = (canvas5.height - 2 * padding5) / maxY5;
+    }
+    
+    function drawGraph5() {
+        ctx5.clearRect(0, 0, canvas5.width, canvas5.height);
+
+        if (!graphDrawn5) {
+            clearCanvas5();
+            return;
+        }
+
+        // Scale Text
+        ctx5.fillStyle = '#1f293b';
+        ctx5.font = 'bold 13px sans-serif';
+        ctx5.textAlign = 'right';
+        ctx5.fillText('அளவுத்திட்டம்:', canvas5.width - 20, padding5 - 15);
+        ctx5.font = '13px sans-serif';
+        ctx5.fillText('X-அச்சு: 1 செ.மீ = 1 அலகு', canvas5.width - 20, padding5 + 5);
+        ctx5.fillText('Y-அச்சு: 1 செ.மீ = 1 அலகு', canvas5.width - 20, padding5 + 25);
+
+        // Axes and Labels
+        ctx5.beginPath();
+        ctx5.moveTo(padding5, padding5);
+        ctx5.lineTo(padding5, canvas5.height - padding5);
+        ctx5.lineTo(canvas5.width - padding5, canvas5.height - padding5);
+        ctx5.strokeStyle = '#333'; ctx5.lineWidth = 2; ctx5.stroke();
+        drawArrow(ctx5, canvas5.width - padding5, canvas5.height - padding5, true);
+        drawArrow(ctx5, padding5, padding5, false);
+        ctx5.fillStyle = '#1e293b'; ctx5.font = 'bold 16px sans-serif'; ctx5.textAlign = 'center';
+        ctx5.fillText('வேகம் (x) (கி.மீ/மணி)', canvas5.width / 2, canvas5.height - 15);
+        ctx5.save();
+        ctx5.translate(20, canvas5.height / 2);
+        ctx5.rotate(-Math.PI / 2);
+        ctx5.fillText('நேரம் (y) (மணி)', 0, 0);
+        ctx5.restore();
+
+        // Ticks and Gridlines
+        ctx5.font = 'bold 12px sans-serif';
+        ctx5.textAlign = 'center'; ctx5.textBaseline = 'top';
+        for (let i = 0; i <= maxX5; i++) {
+            const x = padding5 + i * xScale5;
+            ctx5.fillStyle = '#1e293b';
+            ctx5.fillText(i, x, canvas5.height - padding5 + 10);
+            if (i > 0) {
+                ctx5.beginPath(); ctx5.moveTo(x, canvas5.height - padding5);
+                ctx5.lineTo(x, padding5);
+                ctx5.lineWidth = 1; ctx5.strokeStyle = '#e2e8f0'; ctx5.stroke();
+            }
+        }
+        ctx5.textAlign = 'right'; ctx5.textBaseline = 'middle';
+        for (let i = 0; i <= maxY5; i++) {
+            const y = canvas5.height - padding5 - i * yScale5;
+            if (i > 0) {
+                ctx5.fillStyle = '#1e293b';
+                ctx5.fillText(i, padding5 - 10, y);
+                ctx5.beginPath(); ctx5.moveTo(padding5, y);
+                ctx5.lineTo(canvas5.width - padding5, y);
+                ctx5.lineWidth = 1; ctx5.strokeStyle = '#e2e8f0'; ctx5.stroke();
+            }
+        }
+
+        userPlottedPoints5.forEach(p => drawPoint5(p.speed, p.time, '#4f46e5', 8));
+        
+        ctx5.font = 'bold 14px sans-serif'; ctx5.fillStyle = '#1e293b';
+        ctx5.textAlign = 'left'; ctx5.textBaseline = 'bottom';
+        userPlottedPoints5.forEach(p => {
+            const xPos = padding5 + p.speed * xScale5;
+            const yPos = canvas5.height - padding5 - p.time * yScale5;
+            ctx5.fillText(`(${p.speed}, ${p.time})`, xPos + 10, yPos - 10);
+        });
+
+        if (isToolActive5 && mouseCanvasPos5.x > 0) {
+             ctx5.textAlign = 'center'; ctx5.textBaseline = 'top'; ctx5.font = '32px sans-serif';
+             const isCorrect = isNearTarget5;
+             
+             ctx5.fillStyle = isCorrect ? '#10b981' : '#ef4444';
+             ctx5.fillText('👆', mouseCanvasPos5.x, mouseCanvasPos5.y);
+             const coordText = `(${snappedGraphPos5.x.toFixed(1)}, ${snappedGraphPos5.y.toFixed(1)})`;
+             ctx5.font = 'bold 20px monospace'; ctx5.textAlign = 'left'; ctx5.textBaseline = 'middle';
+             const textMetrics = ctx5.measureText(coordText);
+             const tailXBase = mouseCanvasPos5.x; const tailY = mouseCanvasPos5.y + 15;
+             let rectX = tailXBase + 20; let textX = rectX + 5;
+             if (rectX + textMetrics.width + 10 > canvas5.width) {
+                 rectX = tailXBase - 20 - textMetrics.width - 10; textX = rectX + 5;
+             }
+             ctx5.fillStyle = isCorrect ? 'rgba(16, 185, 129, 0.9)' : 'rgba(30, 41, 59, 0.8)';
+             ctx5.beginPath();
+             ctx5.roundRect(rectX, tailY - 14, textMetrics.width + 10, 28, 7);
+             ctx5.fill();
+             ctx5.fillStyle = '#ffffff'; ctx5.fillText(coordText, textX, tailY);
+        }
+
+        if (lineDrawn5) {
+            drawLine5();
+             if (!isAnimating5) {
+                drawSpeedSliderVisuals5();
+            }
+        }
+    }
+    
+    function drawPoint5(speed, time, color = '#4f46e5', radius = 6) {
+        if (speed > maxX5 || time > maxY5) return;
+        const x = padding5 + speed * xScale5;
+        const y = canvas5.height - padding5 - time * yScale5;
+        ctx5.beginPath(); ctx5.arc(x, y, radius, 0, Math.PI * 2);
+        ctx5.fillStyle = color; ctx5.fill();
+        ctx5.strokeStyle = 'white'; ctx5.lineWidth = 2; ctx5.stroke();
+    }
+    
+    function startManualPlotting5() {
+        graphDrawn5 = true; plottingMode5 = true; currentPointIndex5 = 0; userPlottedPoints5 = [];
+        plotBtn5.disabled = true;
+        updateGraphBounds5();
+        drawGraph5();
+        plotToolActivator5.classList.remove('hidden');
+        activatorFinger5.addEventListener('click', activatePlottingTool5, { once: true });
+        updateFeedbackForPlotting5();
+    }
+    
+    function activatePlottingTool5() {
+        isToolActive5 = true; document.body.classList.add('no-select');
+        canvas5.classList.add('plotting-active');
+        plotToolActivator5.classList.add('hidden');
+        updateFeedbackForPlotting5();
+        plotMoveHandler5 = (e) => plotMove(e, 5);
+        touchMoveHandler5 = (e) => plotMove(e, 5);
+        plotClickHandler5 = (e) => handlePlotClick(e, 5);
+        document.addEventListener('mousemove', plotMoveHandler5);
+        document.addEventListener('touchmove', touchMoveHandler5, { passive: false });
+        canvas5.addEventListener('click', plotClickHandler5);
+    }
+    
+    function updateFeedbackForPlotting5() {
+        if (currentPointIndex5 < data5.length) {
+            const target = data5[currentPointIndex5];
+            feedbackBox5.innerHTML = `${target.icon} <b>${target.name}</b>-இன் புள்ளியைக் குறிக்கவும்: <b>(${target.speed}, ${target.time})</b>`;
+        }
+    }
+
+    function drawLine5() {
+        if (!pointsPlotted5) return;
+        ctx5.beginPath();
+        ctx5.strokeStyle = '#ef4444'; ctx5.lineWidth = 3;
+        let firstPoint = true;
+        for (let xVal = 1; xVal <= maxX5; xVal += 0.1) {
+            const yVal = inverseConstant5 / xVal;
+            if (yVal <= maxY5 && yVal > 0) {
+                const x = padding5 + xVal * xScale5;
+                const y = canvas5.height - padding5 - yVal * yScale5;
+                if (firstPoint) {
+                    ctx5.moveTo(x, y);
+                    firstPoint = false;
+                } else {
+                    ctx5.lineTo(x, y);
+                }
+            }
+        }
+        ctx5.stroke();
+    }
+    
+    function drawSpeedSliderVisuals5() {
+        if (!lineDrawn5 || questionsSection5.classList.contains('hidden')) return;
+        const speed = parseFloat(speedSlider5.value);
+        const time = inverseConstant5 / speed;
+        
+        // Draw helper lines
+        const x = padding5 + speed * xScale5;
+        const y = canvas5.height - padding5 - time * yScale5;
+        if(x > padding5 && y > padding5 && x < (canvas5.width - padding5) && y < (canvas5.height - padding5) ){
+            ctx5.beginPath(); ctx5.setLineDash([5, 5]); ctx5.strokeStyle = '#10b981'; ctx5.lineWidth = 2;
+            ctx5.moveTo(x, canvas5.height - padding5); ctx5.lineTo(x, y); ctx5.lineTo(padding5, y);
+            ctx5.stroke(); ctx5.setLineDash([]);
+            drawPoint5(speed, time, '#10b981', 8);
+        }
+    }
+
+    function handleSpeedSlider5() {
+        if (!lineDrawn5) return;
+        const speed = parseFloat(speedSlider5.value);
+        sliderValue5_speed.textContent = speed.toFixed(1);
+        const time = inverseConstant5 / speed;
+        resultBox5_time.innerHTML = `நேரம் = தூரம் / வேகம் <br> நேரம் = 12 / ${speed.toFixed(1)} = <b>${time.toFixed(1)} மணி</b>`;
+        
+        drawGraph5(); 
+    }
+
+    function activateSpeedFinder() {
+        plotToolActivator5.classList.add('hidden');
+        isToolActive5 = true;
+        waitForSpeedClick = true;
+        feedbackBox5.innerHTML = 'வரைபடத்தில் x- அச்சில் <b>(2.4, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+        canvas5.classList.add('plotting-active');
+        document.body.classList.add('no-select');
+
+        plotMoveHandler5 = (e) => plotMoveForSpeed(e);
+        touchMoveHandler5 = (e) => plotMoveForSpeed(e);
+        plotClickHandler5 = (e) => handlePlotClickForSpeed(e);
+
+        document.addEventListener('mousemove', plotMoveHandler5);
+        document.addEventListener('touchmove', touchMoveHandler5, { passive: false });
+        canvas5.addEventListener('click', plotClickHandler5);
+    }
+
+    function plotMoveForSpeed(e) {
+        if (!isToolActive5 || !waitForSpeedClick) return;
+        e.preventDefault();
+        const rect = canvas5.getBoundingClientRect();
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+        else { clientX = e.clientX; clientY = e.clientY; }
+
+        const rawMouseX = clientX - rect.left;
+        const rawMouseY = clientY - rect.top;
+        let graphX = (rawMouseX - padding5) / xScale5;
+        let graphY = (canvas5.height - padding5 - rawMouseY) / yScale5;
+
+        graphX = Math.max(0, Math.min(maxX5, graphX));
+        graphY = Math.max(0, Math.min(maxY5, graphY));
+
+        snappedGraphPos5.x = parseFloat((Math.round(graphX * 10) / 10).toFixed(1));
+        snappedGraphPos5.y = parseFloat(Math.round(graphY).toFixed(1));
+
+        mouseCanvasPos5.x = padding5 + snappedGraphPos5.x * xScale5;
+        mouseCanvasPos5.y = canvas5.height - padding5 - snappedGraphPos5.y * yScale5;
+
+        isNearTarget5 = (snappedGraphPos5.x === 2.4 && snappedGraphPos5.y === 0.0);
+        drawGraph5();
+    }
+
+    function handlePlotClickForSpeed(e) {
+        if (!isToolActive5 || !waitForSpeedClick) return;
+        if (e.target.closest('.controls-panel')) return;
+        e.preventDefault();
+
+        if (isNearTarget5) {
+            isToolActive5 = false;
+            waitForSpeedClick = false;
+            document.removeEventListener('mousemove', plotMoveHandler5);
+            document.removeEventListener('touchmove', touchMoveHandler5);
+            canvas5.removeEventListener('click', plotClickHandler5);
+            canvas5.classList.remove('plotting-active');
+            document.body.classList.remove('no-select');
+            mouseCanvasPos5 = { x: -1, y: -1 };
+            
+            feedbackBox5.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
+            animateSolution5_speedToTime(2.4, () => {
+                questionsSection5.classList.remove('hidden');
+                handleSpeedSlider5();
+                feedbackBox5.textContent = 'சிறப்பு! இப்போது ஸ்லைடரைப் பயன்படுத்தி மற்ற வேகங்களுக்கான நேரத்தைக் கண்டறியவும்.';
+            });
+        } else {
+            feedbackBox5.style.backgroundColor = '#fee2e2';
+            feedbackBox5.style.color = '#b91c1c';
+            feedbackBox5.textContent = 'தவறு. வரைபடத்தில் x- அச்சில் (2.4, 0) புள்ளியைக் கண்டறியவும்.';
+            setTimeout(() => {
+                feedbackBox5.style.backgroundColor = '#eef2ff';
+                feedbackBox5.style.color = 'var(--primary-dark)';
+                feedbackBox5.innerHTML = 'வரைபடத்தில் x- அச்சில் <b>(2.4, 0)</b> என்ற புள்ளியைக் கண்டறியவும்.';
+            }, 2000);
+        }
+    }
+
+    function animateSolution5_speedToTime(speed, onComplete) {
+        const time = inverseConstant5 / speed;
+        const duration = 1500;
+        let startTime = null;
+        isAnimating5 = true;
+
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / (duration * 2), 1);
+
+            drawGraph5(); 
+
+            const x_canvas = padding5 + speed * xScale5;
+            const y_intersect_canvas = canvas5.height - padding5 - time * yScale5;
+
+            if (percentage <= 0.5) { 
+                const p = percentage * 2;
+                const y_start_canvas = canvas5.height - padding5;
+                const y_current_canvas = y_start_canvas + (y_intersect_canvas - y_start_canvas) * p;
+                ctx5.beginPath();
+                ctx5.setLineDash([5, 5]);
+                ctx5.strokeStyle = '#10b981';
+                ctx5.lineWidth = 2;
+                ctx5.moveTo(x_canvas, y_start_canvas);
+                ctx5.lineTo(x_canvas, y_current_canvas);
+                ctx5.stroke();
+            } else { 
+                drawPoint5(speed, time, '#10b981', 8);
+                const p = (percentage - 0.5) * 2;
+                ctx5.beginPath();
+                ctx5.setLineDash([5, 5]);
+                ctx5.strokeStyle = '#10b981';
+                ctx5.lineWidth = 2;
+                ctx5.moveTo(x_canvas, canvas5.height - padding5);
+                ctx5.lineTo(x_canvas, y_intersect_canvas);
+
+                const x_start_canvas = x_canvas;
+                const x_target_canvas = padding5;
+                const x_current_canvas = x_start_canvas + (x_target_canvas - x_start_canvas) * p;
+                ctx5.moveTo(x_start_canvas, y_intersect_canvas);
+                ctx5.lineTo(x_current_canvas, y_intersect_canvas);
+                ctx5.stroke();
+            }
+            ctx5.setLineDash([]);
+
+            if (progress < (duration * 2)) {
+                requestAnimationFrame(animate);
+            } else {
+                isAnimating5 = false;
+                if (onComplete) onComplete();
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+
+    function resetSimulation5() {
+        if (plotMoveHandler5) document.removeEventListener('mousemove', plotMoveHandler5);
+        if (touchMoveHandler5) document.removeEventListener('touchmove', touchMoveHandler5);
+        if (plotClickHandler5) canvas5.removeEventListener('click', plotClickHandler5);
+        
+        const newActivator = activatorFinger5.cloneNode(true);
+        activatorFinger5.parentNode.replaceChild(newActivator, activatorFinger5);
+        activatorFinger5 = newActivator;
+    
+        initModel5();
+    }
+
     // --- EVENT LISTENERS ---
 
     // General
     headerTitle.addEventListener('click', () => {
         homeScreen.classList.remove('hidden');
         simulationScreen.classList.add('hidden');
-        resetSimulation();
-        resetSimulation2();
-        resetSimulation3();
-        resetSimulation4();
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
     });
 
     graphButton.addEventListener('click', () => {
@@ -2579,10 +3039,7 @@
     backBtn.addEventListener('click', () => {
         homeScreen.classList.remove('hidden');
         simulationScreen.classList.add('hidden');
-        resetSimulation();
-        resetSimulation2();
-        resetSimulation3();
-        resetSimulation4();
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
     });
 
     addPointBtn.addEventListener('click', () => {
@@ -2615,12 +3072,10 @@
         drawGraph();
         lineBtn.disabled = true;
         
-        // Re-purpose the plot tool activator to start the "find x=6" step
         feedbackBox.innerHTML = 'சிறப்பு! இப்போது விட்டமானது 6 செ.மீ ஆக இருக்கும்போது அதன் சுற்றளவைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
         plotToolActivator.querySelector('span').textContent = 'x = 6 இல் மதிப்பைக் கண்டறியவும்';
         plotToolActivator.classList.remove('hidden');
 
-        // Remove old listeners and add a new one-time listener to start the find process
         const newActivator = activatorFinger.cloneNode(true);
         activatorFinger.parentNode.replaceChild(newActivator, activatorFinger);
         activatorFinger = newActivator;
@@ -2635,10 +3090,7 @@
     backBtn2.addEventListener('click', () => {
         homeScreen.classList.remove('hidden');
         simulationScreen.classList.add('hidden');
-        resetSimulation();
-        resetSimulation2();
-        resetSimulation3();
-        resetSimulation4();
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
     });
 
     addPointBtn2.addEventListener('click', () => {
@@ -2675,7 +3127,6 @@
         lineDrawn2 = true;
         lineBtn2.disabled = true;
         
-        // Setup for question (ii)
         feedbackBox2.innerHTML = '<b>கேள்வி (ii)</b>: 90 நிமிடங்களில் பயணிக்கும் தூரத்தைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
         plotToolActivator2.querySelector('span').textContent = 'x = 90 இல் மதிப்பைக் கண்டறியவும்';
         plotToolActivator2.classList.remove('hidden');
@@ -2748,7 +3199,6 @@
 
             feedbackBox2.textContent = 'சரியானது! தீர்வு எவ்வாறு கண்டறியப்படுகிறது என்பதைப் பாருங்கள்...';
             animateSolution2_timeToDist(90, () => {
-                // Setup for question (iii)
                 feedbackBox2.innerHTML = '<b>கேள்வி (iii)</b>: 300 கி.மீ. பயணிக்க ஆகும் நேரத்தைக் கண்டறியும் கருவியை இயக்க, பொத்தானை அழுத்தவும்.';
                 plotToolActivator2.querySelector('span').textContent = 'y = 300 இல் மதிப்பைக் கண்டறியவும்';
                 plotToolActivator2.classList.remove('hidden');
@@ -3007,10 +3457,7 @@
     backBtn3.addEventListener('click', () => {
         homeScreen.classList.remove('hidden');
         simulationScreen.classList.add('hidden');
-        resetSimulation();
-        resetSimulation2();
-        resetSimulation3();
-        resetSimulation4();
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
     });
 
     addPointBtn3.addEventListener('click', () => {
@@ -3349,10 +3796,7 @@
     backBtn4.addEventListener('click', () => {
         homeScreen.classList.remove('hidden');
         simulationScreen.classList.add('hidden');
-        resetSimulation();
-        resetSimulation2();
-        resetSimulation3();
-        resetSimulation4();
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
     });
 
     addPointBtn4.addEventListener('click', () => {
@@ -3721,12 +4165,41 @@
     ySlider4.addEventListener('input', handleYSlider4);
     resetBtn4.addEventListener('click', resetSimulation4);
 
+    // Model 5
+    backBtn5.addEventListener('click', () => {
+        homeScreen.classList.remove('hidden');
+        simulationScreen.classList.add('hidden');
+        resetSimulation(); resetSimulation2(); resetSimulation3(); resetSimulation4(); resetSimulation5();
+    });
+    
+    plotBtn5.addEventListener('click', startManualPlotting5);
+    lineBtn5.addEventListener('click', () => {
+        if (!pointsPlotted5) return;
+        lineDrawn5 = true;
+        lineBtn5.disabled = true;
+        drawGraph5();
+
+        feedbackBox5.innerHTML = '<b>கேள்வி</b>: கெளசிக்கின் நேரத்தைக் கண்டறிய, வரைபடத்தில் <b>வேகம் (x) = 2.4</b> ஐக் கண்டறியும் கருவியை இயக்கவும்.';
+        plotToolActivator5.querySelector('span').textContent = 'x = 2.4 இல் மதிப்பைக் கண்டறியவும்';
+        plotToolActivator5.classList.remove('hidden');
+
+        const newActivator = activatorFinger5.cloneNode(true);
+        activatorFinger5.parentNode.replaceChild(newActivator, activatorFinger5);
+        activatorFinger5 = newActivator;
+
+        activatorFinger5.addEventListener('click', activateSpeedFinder, { once: true });
+    });
+    
+    speedSlider5.addEventListener('input', handleSpeedSlider5);
+    resetBtn5.addEventListener('click', resetSimulation5);
+
 
     // Initial setup
     clearCanvas();
     clearCanvas2();
     clearCanvas3();
     clearCanvas4();
+    clearCanvas5();
 
 </script>
 
